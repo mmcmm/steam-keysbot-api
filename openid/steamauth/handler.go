@@ -36,7 +36,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		dbconn := r.Context().Value("DBCONN").(*sql.DB)
-		_, err = dbconn.Exec(`INSERT INTO users (id, username) VALUES ($1, 'test') ON CONFLICT DO NOTHING`, steamId)
+		_, err = dbconn.Exec(`INSERT INTO users (steam_id) VALUES ($1) ON CONFLICT DO NOTHING`, steamId)
 		if err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
