@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type PlayerSummaries struct {
+type playerSummaries struct {
 	SteamId                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
 	ProfileState             int    `json:"profilestate"`
@@ -31,7 +31,7 @@ type PlayerSummaries struct {
 	GameServerIp      string `json:"gameserverip"`
 }
 
-func getPlayerSummaries(steamId, apiKey string) (*PlayerSummaries, error) {
+func getPlayerSummaries(steamId, apiKey string) (*playerSummaries, error) {
 	url := fmt.Sprintf("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s", apiKey, steamId)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -44,7 +44,7 @@ func getPlayerSummaries(steamId, apiKey string) (*PlayerSummaries, error) {
 
 	type Result struct {
 		Response struct {
-			Players []PlayerSummaries `json:"players"`
+			Players []playerSummaries `json:"players"`
 		} `json:"response"`
 	}
 	var data Result
