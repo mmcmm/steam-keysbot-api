@@ -7,13 +7,16 @@ import (
 	"testing"
 
 	"github.com/mtdx/keyc/common"
+	"github.com/mtdx/keyc/db"
 )
 
 var ts *httptest.Server
 var body, expected string
 
 func TestMain(m *testing.M) {
-	r := StartRouter()
+	dbconn := db.Open()
+	defer dbconn.Close()
+	r := StartRouter(dbconn)
 	ts = httptest.NewServer(r)
 	defer ts.Close()
 

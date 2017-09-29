@@ -1,7 +1,10 @@
 CREATE TABLE users
 (
-  id         BIGINT            NOT NULL
-    CONSTRAINT user_pkey
+  steam_id  BIGINT NOT NULL
+    CONSTRAINT users_pkey
     PRIMARY KEY,
-  username   VARCHAR(255)
+  trade_link_url VARCHAR(255),
+  bitcoin_balance INTEGER DEFAULT 0  NOT NULL,
+  csgokey_balance INTEGER DEFAULT 0  NOT NULL,
+  added_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

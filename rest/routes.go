@@ -12,7 +12,6 @@ import (
 	"github.com/go-chi/render"
 	"github.com/mtdx/keyc/config"
 	"github.com/mtdx/keyc/openid/steamauth"
-	"github.com/mtdx/keyc/rest/handler"
 )
 
 var r *chi.Mux
@@ -21,8 +20,6 @@ func addRoutes() {
 	tokenAuth := jwtauth.New("HS256", []byte(config.JwtKey()), nil)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/", handler.Home)
-		r.Get("/auth", handler.Auth)
 		r.Get("/login", steamauth.LoginHandler)
 
 		// Protected routes
