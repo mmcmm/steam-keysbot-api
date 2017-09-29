@@ -5,9 +5,9 @@ import "os"
 // Env config from env or dev defaults
 func Env() map[string]string {
 	m := map[string]string{
-		"host":     os.Getenv("DB_HOST"),
-		"user":     os.Getenv("DB_USER"),
-		"password": os.Getenv("DB_PASSWORD"),
+		"host":     os.Getenv("KEYC_DB_HOST"),
+		"user":     os.Getenv("KEYC_DB_USER"),
+		"password": os.Getenv("KEYC_DB_PASSWORD"),
 	}
 
 	if m["host"] == "" {
