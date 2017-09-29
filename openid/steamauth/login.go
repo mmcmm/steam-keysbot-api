@@ -44,7 +44,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		dbconn := r.Context().Value("DBCONN").(*sql.DB)
 		_, err = dbconn.Exec(`INSERT INTO users (steam_id, display_name, avatar) VALUES ($1, $2, $3) 
-		ON CONFLICT UPDATE users SET display_name = $2, avatar = $3`,
+		ON CONFLICT (steam_id) DO UPDATE SET display_name = $2, avatar = $3`,
 			steamId, player.PersonaName, player.Avatar)
 		if err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
