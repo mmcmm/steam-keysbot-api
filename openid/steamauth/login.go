@@ -36,14 +36,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			render.Render(w, r, common.ErrInvalidRequest(err))
 			return
 		}
-		player, err := getPlayerSummaries(steamId, apiKey)
+		player, err := getPlayerSummaries(steamId, config.SteamAPIKey())
 		if err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
 		}
 
 		dbconn := r.Context().Value("DBCONN").(*sql.DB)
-		_, err = dbconn.Exec(`INSERT INTO users (steam_id) VALUES ($1) ON CONFLICT DO NOTHING`, steamId)
+		_, err = dbconn.Exec(`INSERT INTO users (steam_id, display_name, avatar) VALUES ($1, $2, $3) 
+		ON CONFLICT UPDATE users SET display_name = $2, avatar = $3`,
+			steamId, player.PersonaName, player.Avatar)
 		if err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return

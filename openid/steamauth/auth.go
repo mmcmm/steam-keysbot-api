@@ -120,7 +120,7 @@ func (id *OpenId) validateAndGetId() (string, error) {
 	return digits_extraction_regexp.ReplaceAllString(openIdUrl, ""), nil
 }
 
-func (id OpenId) validateAndGetUser(apiKey string) (*PlayerSummaries, error) {
+func (id OpenId) validateAndGetUser(apiKey string) (*playerSummaries, error) {
 	steamId, err := id.validateAndGetId()
 	if err != nil {
 		return nil, err
