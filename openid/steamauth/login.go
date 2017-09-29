@@ -2,6 +2,7 @@ package steamauth
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"time"
 
@@ -27,7 +28,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, opId.authUrl(), 301)
 		return
 	case "cancel":
-		w.Write([]byte("Authorization cancelled"))
+		render.Render(w, r, common.ErrInvalidRequest(errors.New("Authorization cancelled")))
 		return
 	default:
 		steamId, err := opId.validateAndGetId()
@@ -35,6 +36,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			render.Render(w, r, common.ErrInvalidRequest(err))
 			return
 		}
+		player, err := getPlayerSummaries(steamId, apiKey)
+		if err != nil {
+			render.Render(w, r, common.ErrInternalServer(err))
+			return
+		}
+
 		dbconn := r.Context().Value("DBCONN").(*sql.DB)
 		_, err = dbconn.Exec(`INSERT INTO users (steam_id) VALUES ($1) ON CONFLICT DO NOTHING`, steamId)
 		if err != nil {
