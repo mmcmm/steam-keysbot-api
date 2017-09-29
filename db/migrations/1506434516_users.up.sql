@@ -6,5 +6,7 @@ CREATE TABLE users
   trade_link_url VARCHAR(255),
   bitcoin_balance INTEGER DEFAULT 0  NOT NULL,
   csgokey_balance INTEGER DEFAULT 0  NOT NULL,
+  display_name  VARCHAR(255) NOT NULL,
+  avatar        VARCHAR(255) NOT NULL,
   added_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
