@@ -26,7 +26,7 @@ func addRoutes() {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
 
-			r.Get("/account", account.Handler)
+			r.Get("/account", account.InfoHandler)
 		})
 	})
 }
