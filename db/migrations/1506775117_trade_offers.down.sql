@@ -1,1 +1,0 @@
-DROP TABLE trade_offers;
