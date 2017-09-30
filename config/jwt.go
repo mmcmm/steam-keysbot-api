@@ -6,7 +6,7 @@ import "os"
 func JwtKey() string {
 	key := os.Getenv("KEYC_JWT_KEY")
 	if key == "" {
-		key = "InsecurePrivateDefaultKey" // default insecure private key
+		key = "4pW78CcZmfBcsPPDVMnCcBd5Ch939sbJyaGc" // default insecure private key
 	}
 	return key
 }
