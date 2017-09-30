@@ -9,6 +9,7 @@ import (
 
 func main() {
 	dbconn := db.Open()
+	db.RunMigrations(dbconn)
 	defer dbconn.Close()
 
 	r := rest.StartRouter(dbconn)

@@ -34,6 +34,11 @@ func Open() *sql.DB {
 		os.Exit(1)
 	}
 
+	return db
+}
+
+// RunMigrations ...
+func RunMigrations(db *sql.DB) {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	m, err := migrate.NewWithDatabaseInstance("file://db/migrations/", "postgres", driver)
 	if err != nil {
@@ -46,6 +51,4 @@ func Open() *sql.DB {
 		fmt.Fprintf(os.Stderr, "Unable to run the migrations: %v\n", err)
 		os.Exit(1)
 	}
-
-	return db
 }
