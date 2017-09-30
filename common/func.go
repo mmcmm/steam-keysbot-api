@@ -9,11 +9,15 @@ import (
 )
 
 // TestRequest ...
-func TestRequest(t *testing.T, ts *httptest.Server, method, path string, body io.Reader) (*http.Response, string) {
+func TestRequest(t *testing.T, ts *httptest.Server, method, path string, body io.Reader, jwt string) (*http.Response, string) {
 	req, err := http.NewRequest(method, ts.URL+path, body)
 	if err != nil {
 		t.Fatal(err)
 		return nil, ""
+	}
+
+	if jwt != "" {
+		req.Header.Add("Authorization", "BEARER "+jwt)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
