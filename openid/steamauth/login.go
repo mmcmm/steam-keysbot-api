@@ -43,21 +43,31 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		dbconn := r.Context().Value("DBCONN").(*sql.DB)
-		_, err = dbconn.Exec(`INSERT INTO users (steam_id, display_name, avatar) VALUES ($1, $2, $3) 
-		ON CONFLICT (steam_id) DO UPDATE SET display_name = $2, avatar = $3`,
-			steamId, player.PersonaName, player.Avatar)
+		tokenString, err := SaveUser(dbconn, steamId, player.PersonaName, player.Avatar)
 		if err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
 		}
 
-		tokenAuth := jwtauth.New("HS256", []byte(config.JwtKey()), nil)
-		exp := time.Now().Add(time.Hour * time.Duration(12)).Unix()
-		claims := jwtauth.Claims{"id": steamId, "exp": exp}
-		_, tokenString, _ := tokenAuth.Encode(claims)
 		resp := &authResponse{Token: tokenString}
-
 		render.Status(r, http.StatusOK)
 		render.Render(w, r, resp)
 	}
+}
+
+// SaveUser ...
+func SaveUser(dbconn *sql.DB, steamID string, personaName string, avatar string) (string, error) {
+	_, err := dbconn.Exec(`INSERT INTO users (steam_id, display_name, avatar) VALUES ($1, $2, $3) 
+	ON CONFLICT (steam_id) DO UPDATE SET display_name = $2, avatar = $3`,
+		steamID, personaName, avatar)
+	if err != nil {
+		return "", err
+	}
+
+	tokenAuth := jwtauth.New("HS256", []byte(config.JwtKey()), nil)
+	exp := time.Now().Add(time.Hour * time.Duration(12)).Unix()
+	claims := jwtauth.Claims{"id": steamID, "exp": exp}
+	_, tokenString, _ := tokenAuth.Encode(claims)
+
+	return tokenString, nil
 }
