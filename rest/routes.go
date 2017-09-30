@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/mtdx/keyc/account"
 	"github.com/mtdx/keyc/openid/steamauth"
-	"github.com/mtdx/keyc/rest/handler"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -26,7 +26,7 @@ func addRoutes() {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
 
-			r.Get("/account", handler.Account)
+			r.Get("/account", account.Handler)
 		})
 	})
 }

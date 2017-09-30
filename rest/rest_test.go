@@ -34,7 +34,17 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestAccount(t *testing.T) {
+func TestAccountSummaryAuth(t *testing.T) {
+	t.Parallel()
+
+	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account", nil, "jwt")
+	expected = `Unauthorized`
+	if strings.Compare(strings.TrimSpace(body), expected) != 0 {
+		t.Fatalf("expected:%s got:%s", expected, body)
+	}
+}
+
+func TestAccountSummary(t *testing.T) {
 	t.Parallel()
 
 	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account", nil, jwt)
