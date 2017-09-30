@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -34,4 +35,13 @@ func TestRequest(t *testing.T, ts *httptest.Server, method, path string, body io
 	defer resp.Body.Close()
 
 	return resp, string(respBody)
+}
+
+// AssertAuth ...
+func AssertAuth(t *testing.T, ts *httptest.Server, method string, route string) {
+	t.Parallel()
+	_, body := TestRequest(t, ts, method, route, nil, "jwt-test")
+	if strings.Compare(strings.TrimSpace(body), `Unauthorized`) != 0 {
+		t.Fatalf("expected: 'Unauthorized' got:%s", body)
+	}
 }

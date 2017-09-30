@@ -26,7 +26,7 @@ const (
 	INESCROW                 = STATUS("INESCROW")
 )
 
-type tradeoffersResponse struct {
+type TradeoffersResponse struct {
 	Type           string         `json:"type"`
 	Status         string         `json:"status"`
 	FailureDetails sql.NullString `json:"failure_details"`
@@ -34,7 +34,7 @@ type tradeoffersResponse struct {
 	CreatedAt      string         `json:"created_at"`
 }
 
-func (rd *tradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) error {
+func (rd *TradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
@@ -51,7 +51,7 @@ func TradeoffersHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	list := []render.Renderer{}
 	for rows.Next() {
-		resp := &tradeoffersResponse{}
+		resp := &TradeoffersResponse{}
 		if err := rows.Scan(&resp.Type, &resp.Status, &resp.FailureDetails, &resp.Amount, &resp.CreatedAt); err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
