@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http/httptest"
 	"os"
@@ -11,6 +12,8 @@ import (
 	"github.com/mtdx/keyc/db"
 	"github.com/mtdx/keyc/openid/steamauth"
 )
+
+const testSteamID = "11111111111111111"
 
 var ts *httptest.Server
 var body, expected, jwt string
@@ -24,13 +27,15 @@ func TestMain(m *testing.M) {
 	defer ts.Close()
 
 	// setup test user
-	jwt, err = steamauth.SaveUser(dbconn, "0", "PersonaName", "https://avatar.com/img.jpg")
+	jwt, err = steamauth.SaveUser(dbconn, testSteamID, "PersonaName", "https://avatar.com/img.jpg")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to generate token: %v\n", err)
 		os.Exit(1)
 	}
 
+	// run tests & clean & exit
 	code := m.Run()
+	cleanDb(dbconn)
 	os.Exit(code)
 }
 
@@ -52,4 +57,12 @@ func TestAccountSummary(t *testing.T) {
 	if strings.Compare(strings.TrimSpace(body), expected) != 0 {
 		t.Fatalf("expected:%s got:%s", expected, body)
 	}
+}
+
+func cleanDb(dbconn *sql.DB) {
+	dbconn.Exec(`DELETE FROM users WHERE steam_id = $1`, testSteamID)
+	dbconn.Exec(`DELETE FROM tradeoffers WHERE user_steam_id = $1`, testSteamID)
+	dbconn.Exec(`DELETE FROM purchases WHERE user_steam_id = $1`, testSteamID)
+	dbconn.Exec(`DELETE FROM withdrawals WHERE user_steam_id = $1`, testSteamID)
+	dbconn.Exec(`DELETE FROM sales WHERE user_steam_id = $1`, testSteamID)
 }
