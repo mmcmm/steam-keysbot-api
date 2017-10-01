@@ -12,12 +12,13 @@ import (
 	"github.com/mtdx/keyc/common"
 	"github.com/mtdx/keyc/db"
 	"github.com/mtdx/keyc/openid/steamauth"
+	"github.com/mtdx/keyc/validator"
 )
 
 const testSteamID = "11111111111111111"
 
 var ts *httptest.Server
-var body, expected, jwt string
+var body, jwt string
 var err error
 
 func TestMain(m *testing.M) {
@@ -50,28 +51,46 @@ func TestAccountSummary(t *testing.T) {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
 	}
 
+	if err := validator.Validate(inforesp); err != nil {
+		t.Fatalf("got: %s", err.Error())
+	}
+
 	if inforesp.BitcoinBalance != 0 || inforesp.CsgokeyBalance != 0 || inforesp.TradeLinkURL.String != "" {
 		t.Fatalf("got: %s", body)
 	}
-
 }
 
-// func TestTradeoffers(t *testing.T) {
-// 	t.Parallel()
+func TestTradeoffersAuth(t *testing.T) {
+	common.AssertAuth(t, ts, "GET", "/api/v1/tradeoffers")
+}
 
-// 	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account", nil, jwt)
-// 	expected = `{"bitcoin_balance":0,"csgokey_balance":0,"trade_link_url":{"String":"","Valid":false}}`
-// 	if strings.Compare(strings.TrimSpace(body), expected) != 0 {
-// 		t.Fatalf("expected:%s got:%s", expected, body)
-// 	}
-// }
+func TestTradeoffers(t *testing.T) {
+	t.Parallel()
+
+	_, body = common.TestRequest(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
+	tradeoffersresp := make([]account.TradeoffersResponse, 2)
+	if err := json.Unmarshal([]byte(body), &tradeoffersresp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+
+	for _, tradeoffer := range tradeoffersresp {
+		if err := validator.Validate(tradeoffer); err != nil {
+			t.Fatalf("got: %s", err.Error())
+		}
+	}
+
+	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Type != string(account.CSGO_KEYS) ||
+		tradeoffersresp[1].Type != string(account.CSGO_CASES) {
+		t.Fatalf("got: %s", body)
+	}
+}
 
 func cleanDb(dbconn *sql.DB) {
-	dbconn.Exec(`DELETE FROM users WHERE steam_id = $1`, testSteamID)
 	dbconn.Exec(`DELETE FROM tradeoffers WHERE user_steam_id = $1`, testSteamID)
 	dbconn.Exec(`DELETE FROM purchases WHERE user_steam_id = $1`, testSteamID)
 	dbconn.Exec(`DELETE FROM withdrawals WHERE user_steam_id = $1`, testSteamID)
 	dbconn.Exec(`DELETE FROM sales WHERE user_steam_id = $1`, testSteamID)
+	dbconn.Exec(`DELETE FROM users WHERE steam_id = $1`, testSteamID)
 }
 
 func setupTestUserData(dbconn *sql.DB) string {
@@ -82,9 +101,9 @@ func setupTestUserData(dbconn *sql.DB) string {
 	}
 
 	dbconn.Exec(`INSERT INTO tradeoffers (user_steam_id, type, status, failure_details, amount) 
-	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, "type1", "status1", "failuredetails1", 1)
+	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_KEYS, account.ACTIVE, "failuredetails1", 1)
 	dbconn.Exec(`INSERT INTO tradeoffers (user_steam_id, type, status, failure_details, amount) 
-	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, "type2", "status2", "failuredetails2", 2)
+	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_CASES, account.ACCEPTED, "failuredetails2", 2)
 
 	return jwt
 }
