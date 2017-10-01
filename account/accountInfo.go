@@ -9,9 +9,10 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
+// InfoResponse ...
 type InfoResponse struct {
-	BitcoinBalance uint64         `json:"bitcoin_balance"`
-	CsgokeyBalance uint64         `json:"csgokey_balance"`
+	BitcoinBalance uint64         `json:"bitcoin_balance" validate:"min=0"`
+	CsgokeyBalance uint64         `json:"csgokey_balance" validate:"min=0"`
 	TradeLinkURL   sql.NullString `json:"trade_link_url"`
 }
 

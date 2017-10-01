@@ -9,8 +9,8 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
-// STATUS trade status
 type STATUS string
+type TYPE string
 
 const (
 	INVALID                  = STATUS("INVALID")
@@ -25,13 +25,18 @@ const (
 	CANCELEDBYSECONDFACTOR   = STATUS("CANCELEDBYSECONDFACTOR")
 	INESCROW                 = STATUS("INESCROW")
 )
+const (
+	CSGO_KEYS  = TYPE("CSGO_KEYS")
+	CSGO_CASES = TYPE("CSGO_CASES")
+)
 
+// TradeoffersResponse ...
 type TradeoffersResponse struct {
-	Type           string         `json:"type"`
-	Status         string         `json:"status"`
+	Type           string         `json:"type" validate:"nonzero"`
+	Status         string         `json:"status" validate:"nonzero"`
 	FailureDetails sql.NullString `json:"failure_details"`
-	Amount         uint64         `json:"amount"`
-	CreatedAt      string         `json:"created_at"`
+	Amount         uint64         `json:"amount" validate:"min=1"`
+	CreatedAt      string         `json:"created_at" validate:"nonzero"`
 }
 
 func (rd *TradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) error {
