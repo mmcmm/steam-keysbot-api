@@ -1,5 +1,4 @@
 // Package validator implements value validations
-
 package validator
 
 import (
