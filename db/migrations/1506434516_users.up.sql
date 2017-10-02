@@ -4,8 +4,6 @@ CREATE TABLE users
     CONSTRAINT users_pkey
     PRIMARY KEY,
   trade_link_url VARCHAR(120),
-    CONSTRAINT trade_link_url_unique
-    UNIQUE
   bitcoin_balance INTEGER DEFAULT 0  NOT NULL,
   csgokey_balance INTEGER DEFAULT 0  NOT NULL,
   display_name  VARCHAR(40) NOT NULL,
