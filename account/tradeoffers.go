@@ -9,9 +9,6 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
-type STATUS string
-type TYPE string
-
 const (
 	INVALID                  = STATUS("INVALID")
 	ACTIVE                   = STATUS("ACTIVE")
@@ -24,10 +21,6 @@ const (
 	CREATEDNEEDSCONFIRMATION = STATUS("CREATEDNEEDSCONFIRMATION")
 	CANCELEDBYSECONDFACTOR   = STATUS("CANCELEDBYSECONDFACTOR")
 	INESCROW                 = STATUS("INESCROW")
-)
-const (
-	CSGO_KEYS  = TYPE("CSGO_KEYS")
-	CSGO_CASES = TYPE("CSGO_CASES")
 )
 
 // TradeoffersResponse ...
