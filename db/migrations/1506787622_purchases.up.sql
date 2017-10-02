@@ -27,3 +27,20 @@ CREATE INDEX purchases_tradeoffer_id_index
   ON purchases (tradeoffer_id);
 CREATE INDEX purchases_payment_address_index
   ON purchases (payment_address);  
+
+
+CREATE OR REPLACE FUNCTION stats_money_transacted_increment()
+  RETURNS TRIGGER AS
+$func$
+BEGIN
+IF NEW.status = 'COMPLETED' THEN
+  UPDATE stats SET money_transacted = money_transacted + NEW.usd_total;
+END IF;  
+  RETURN NEW;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER stats_money_transacted_increment
+AFTER UPDATE ON purchases FOR EACH ROW
+EXECUTE PROCEDURE stats_money_transacted_increment()

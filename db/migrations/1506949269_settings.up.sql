@@ -7,5 +7,5 @@ CREATE TABLE settings
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 
-INSERT INTO stats (id, btc_to_usd_rate) 
+INSERT INTO settings (id, btc_to_usd_rate) 
 VALUES (1, 0) ON CONFLICT DO NOTHING;

@@ -1,1 +1,1 @@
-    -
+    - handle stats `current_value`
