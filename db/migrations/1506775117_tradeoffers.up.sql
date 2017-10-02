@@ -8,7 +8,7 @@ CREATE TABLE tradeoffers
     REFERENCES users,
   type              VARCHAR(25)                            NOT NULL,
   status            VARCHAR(25)                            NOT NULL,
-  merchant_steam_id BIGINT,                        
+  merchant_steam_id BIGINT,
   steam_offer_id    BIGINT,
   failure_details   VARCHAR(255),
   amount            INTEGER                                NOT NULL,
@@ -16,3 +16,20 @@ CREATE TABLE tradeoffers
 );
 CREATE INDEX tradeoffers_user_steam_id_index
   ON tradeoffers (user_steam_id);
+
+
+  CREATE OR REPLACE FUNCTION stats_tradeoffers_daily_increment()
+  RETURNS TRIGGER AS
+$func$
+BEGIN
+IF NEW.status = 'ACCEPTED' THEN
+  UPDATE stats SET daily_tradeoffers = daily_tradeoffers + 1;
+END IF;  
+  RETURN NEW;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER stats_tradeoffers_daily_increment
+AFTER UPDATE ON tradeoffers FOR EACH ROW
+EXECUTE PROCEDURE stats_tradeoffers_daily_increment()
