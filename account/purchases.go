@@ -11,12 +11,15 @@ import (
 
 // PurchasesResponse ...
 type PurchasesResponse struct {
-	Type      string `json:"type" validate:"nonzero"`
-	Status    string `json:"status" validate:"nonzero"`
-	Amount    uint32 `json:"amount" validate:"min=1"`
-	UnitPrice uint32 `json:"unit_price" validate:"nonzero"`
-
-	CreatedAt string `json:"created_at" validate:"nonzero"`
+	Type           string  `json:"type" validate:"nonzero"`
+	Status         string  `json:"status" validate:"nonzero"`
+	Amount         uint32  `json:"amount" validate:"min=1"`
+	UnitPrice      uint32  `json:"unit_price" validate:"nonzero"`
+	PaymentAddress string  `json:"payment_address" validate:"nonzero"`
+	USDRate        float64 `json:"usd_rate" validate:"nonzero"`
+	USDTotal       float64 `json:"usd_total" validate:"nonzero"`
+	CryptoTotal    float64 `json:"crypto_total" validate:"nonzero"`
+	CreatedAt      string  `json:"created_at" validate:"nonzero"`
 }
 
 func (rd *PurchasesResponse) Render(w http.ResponseWriter, r *http.Request) error {

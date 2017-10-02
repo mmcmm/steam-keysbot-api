@@ -13,5 +13,5 @@ func main() {
 	defer dbconn.Close()
 
 	r := rest.StartRouter(dbconn)
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":8080", r)
 }
