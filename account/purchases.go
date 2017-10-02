@@ -9,8 +9,8 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
-// TradeoffersResponse ...
-type TradeoffersResponse struct {
+// PurchasesResponse ...
+type PurchasesResponse struct {
 	Type           string         `json:"type" validate:"nonzero"`
 	Status         string         `json:"status" validate:"nonzero"`
 	FailureDetails sql.NullString `json:"failure_details"`
@@ -18,16 +18,16 @@ type TradeoffersResponse struct {
 	CreatedAt      string         `json:"created_at" validate:"nonzero"`
 }
 
-func (rd *TradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) error {
+func (rd *PurchasesResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// TradeoffersHandler rest route handler
-func TradeoffersHandler(w http.ResponseWriter, r *http.Request) {
+// PurchasesHandler rest route handler
+func PurchasesHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
 	rows, err := dbconn.Query(`SELECT type, status, failure_details, amount, created_at 
-		FROM tradeoffers WHERE user_steam_id = $1`, claims["id"])
+		FROM Purchases WHERE user_steam_id = $1`, claims["id"])
 	if err != nil {
 		render.Render(w, r, common.ErrInternalServer(err))
 		return
@@ -35,7 +35,7 @@ func TradeoffersHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	list := []render.Renderer{}
 	for rows.Next() {
-		resp := &TradeoffersResponse{}
+		resp := &PurchasesResponse{}
 		if err := rows.Scan(&resp.Type, &resp.Status, &resp.FailureDetails, &resp.Amount, &resp.CreatedAt); err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return

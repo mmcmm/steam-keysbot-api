@@ -9,14 +9,6 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
-type STATUS string
-type TYPE string
-
-const (
-	CSGO_KEY  = TYPE("CSGO_KEY")
-	CSGO_CASE = TYPE("CSGO_CASE")
-)
-
 // InfoResponse ...
 type InfoResponse struct {
 	BitcoinBalance uint64         `json:"bitcoin_balance" validate:"min=0"`
