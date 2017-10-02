@@ -14,7 +14,7 @@ type TradeoffersResponse struct {
 	Type           string         `json:"type" validate:"nonzero"`
 	Status         string         `json:"status" validate:"nonzero"`
 	FailureDetails sql.NullString `json:"failure_details"`
-	Amount         uint64         `json:"amount" validate:"min=1"`
+	Amount         uint32         `json:"amount" validate:"min=1"`
 	CreatedAt      string         `json:"created_at" validate:"nonzero"`
 }
 
