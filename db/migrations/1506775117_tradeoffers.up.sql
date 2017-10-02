@@ -18,7 +18,7 @@ CREATE INDEX tradeoffers_user_steam_id_index
   ON tradeoffers (user_steam_id);
 
 
-  CREATE OR REPLACE FUNCTION stats_tradeoffers_daily_increment()
+CREATE OR REPLACE FUNCTION stats_tradeoffers_daily_increment()
   RETURNS TRIGGER AS
 $func$
 BEGIN
