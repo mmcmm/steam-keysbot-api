@@ -79,8 +79,8 @@ func TestTradeoffers(t *testing.T) {
 		}
 	}
 
-	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Type != string(account.CSGO_KEYS) ||
-		tradeoffersresp[1].Type != string(account.CSGO_CASES) {
+	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Type != string(account.CSGO_KEY) ||
+		tradeoffersresp[1].Type != string(account.CSGO_CASE) {
 		t.Fatalf("got: %s", body)
 	}
 }
@@ -101,9 +101,9 @@ func setupTestUserData(dbconn *sql.DB) string {
 	}
 
 	dbconn.Exec(`INSERT INTO tradeoffers (user_steam_id, type, status, failure_details, amount) 
-	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_KEYS, account.ACTIVE, "failuredetails1", 1)
+	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_KEY, account.ACTIVE, "failuredetails1", 1)
 	dbconn.Exec(`INSERT INTO tradeoffers (user_steam_id, type, status, failure_details, amount) 
-	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_CASES, account.ACCEPTED, "failuredetails2", 2)
+	 VALUES ($1, $2, $3, $4, $5)`, testSteamID, account.CSGO_CASE, account.ACCEPTED, "failuredetails2", 2)
 
 	return jwt
 }
