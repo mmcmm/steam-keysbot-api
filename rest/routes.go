@@ -25,9 +25,11 @@ func addRoutes() {
 		r.Group(func(r chi.Router) {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
-
-			r.Get("/account", account.InfoHandler)
-			r.Get("/tradeoffers", account.TradeoffersHandler)
+			r.Route("/account", func(r chi.Router) {
+				r.Get("/", account.InfoHandler)
+				r.Get("/tradeoffers", account.TradeoffersHandler)
+				r.Get("/purchases", account.PurchasesHandler)
+			})
 		})
 	})
 }
