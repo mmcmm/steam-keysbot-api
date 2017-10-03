@@ -2,6 +2,7 @@ package account
 
 type STATUS string
 type TYPE string
+type CURRENCY string
 
 const (
 	CSGO_KEY  = TYPE("CSGO_KEY")
@@ -17,4 +18,9 @@ const (
 	DECLINED  = STATUS("DECLINED")
 	COMPLETED = STATUS("COMPLETED")
 	UNPAID    = STATUS("UNPAID")
+)
+
+const (
+	BTC = CURRENCY("BTC")
+	ETH = CURRENCY("ETH")
 )
