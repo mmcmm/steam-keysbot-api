@@ -18,7 +18,7 @@ CREATE TABLE purchases
   usd_rate        NUMERIC(10, 2)                         NOT NULL,
   currency        VARCHAR(3)                             NOT NULL,
   usd_total       NUMERIC(10, 2)                         NOT NULL,
-  crypto_total    NUMERIC(10, 2)                         NOT NULL,
+  crypto_total    NUMERIC(10, 8)                         NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 CREATE INDEX purchases_user_steam_id_index
