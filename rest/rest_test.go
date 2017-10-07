@@ -38,8 +38,8 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestAccountSummaryAuth(t *testing.T) {
-	common.AssertAuth(t, ts, "GET", "/api/v1/account")
+func TestAccountSummaryAuthRequired(t *testing.T) {
+	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account")
 }
 
 func TestAccountSummary(t *testing.T) {
@@ -60,8 +60,8 @@ func TestAccountSummary(t *testing.T) {
 	}
 }
 
-func TestTradeoffersAuth(t *testing.T) {
-	common.AssertAuth(t, ts, "GET", "/api/v1/account/tradeoffers")
+func TestTradeoffersAuthRequired(t *testing.T) {
+	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account/tradeoffers")
 }
 
 func TestTradeoffers(t *testing.T) {
@@ -85,6 +85,31 @@ func TestTradeoffers(t *testing.T) {
 	}
 }
 
+func TestPurchasesAuthRequired(t *testing.T) {
+	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account/purchases")
+}
+
+func TestPurchases(t *testing.T) {
+	t.Parallel()
+
+	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account/purchases", nil, jwt)
+	purchasesresp := make([]account.PurchasesResponse, 2)
+	if err := json.Unmarshal([]byte(body), &purchasesresp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+
+	for _, purchase := range purchasesresp {
+		if err := validator.Validate(purchase); err != nil {
+			t.Fatalf("got: %s", err.Error())
+		}
+	}
+
+	if len(purchasesresp) != 2 || purchasesresp[0].Status != string(account.UNPAID) ||
+		purchasesresp[1].Type != string(account.CSGO_KEY) {
+		t.Fatalf("got: %s", body)
+	}
+}
+
 func setupTestUserData(dbconn *sql.DB) string {
 	jwt, err = steamauth.SaveUser(dbconn, testSteamID, "PersonaName", "https://avatar.com/img.jpg")
 	if err != nil {
@@ -103,7 +128,7 @@ func setupTestUserData(dbconn *sql.DB) string {
 		1, 1.86, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 4.3343, account.BTC, 200, 0.00425076)
 	_, err = dbconn.Exec(`INSERT INTO purchases (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
 			payment_address, usd_rate, currency, usd_total, crypto_total)
-		 VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, testSteamID, 2, account.UNPAID, account.CSGO_CASE,
+		 VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, testSteamID, 2, account.UNPAID, account.CSGO_KEY,
 		2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, account.BTC, 200, 0.00568021)
 
 	if err != nil {

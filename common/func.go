@@ -38,7 +38,7 @@ func TestRequest(t *testing.T, ts *httptest.Server, method, path string, body io
 }
 
 // AssertAuth ...
-func AssertAuth(t *testing.T, ts *httptest.Server, method string, route string) {
+func AssertAuthRequired(t *testing.T, ts *httptest.Server, method string, route string) {
 	t.Parallel()
 	_, body := TestRequest(t, ts, method, route, nil, "jwt-test")
 	if strings.Compare(strings.TrimSpace(body), `Unauthorized`) != 0 {
