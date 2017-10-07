@@ -11,6 +11,8 @@ CREATE TABLE tradeoffers
   merchant_steam_id BIGINT,
   steam_offer_id    BIGINT,
   failure_details   VARCHAR(255),
+  user_items        VARCHAR(255),
+  bot_items         VARCHAR(255),
   amount            INTEGER                                NOT NULL,
   created_at        TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
