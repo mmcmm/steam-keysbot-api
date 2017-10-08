@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION stats_tradeoffers_daily_increment()
   RETURNS TRIGGER AS
 $func$
 BEGIN
-IF NEW.status = 'ACCEPTED' THEN
+IF NEW.status = 2 THEN -- ACCEPTED
   UPDATE stats SET daily_tradeoffers = daily_tradeoffers + 1;
 END IF;  
   RETURN NEW;

@@ -33,7 +33,7 @@ CREATE OR REPLACE FUNCTION stats_money_transacted_increment()
   RETURNS TRIGGER AS
 $func$
 BEGIN
-IF NEW.status = 'COMPLETED' THEN
+IF NEW.status = 7 THEN -- COMPLETED
   UPDATE stats SET money_transacted = money_transacted + NEW.usd_total;
 END IF;  
   RETURN NEW;
