@@ -10,13 +10,13 @@ CREATE TABLE purchases
   tradeoffer_id   BIGINT                                 NOT NULL
     CONSTRAINT purchases_tradeoffer_id_foreign
     REFERENCES tradeoffers,
-  status          VARCHAR(25)                            NOT NULL,
-  type            VARCHAR(25)                            NOT NULL,
+  status          INTEGER                                NOT NULL,
+  type            INTEGER                                NOT NULL,
   amount          INTEGER                                NOT NULL,
   unit_price      NUMERIC(10, 2)                         NOT NULL,
   payment_address VARCHAR(60),
-  usd_price        NUMERIC(10, 2)                        NOT NULL,
-  currency        VARCHAR(3)                             NOT NULL,
+  usd_price       NUMERIC(10, 2)                         NOT NULL,
+  currency        INTEGER                                NOT NULL,
   usd_total       NUMERIC(10, 2)                         NOT NULL,
   crypto_total    NUMERIC(10, 8)                         NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL

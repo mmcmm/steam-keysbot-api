@@ -79,8 +79,8 @@ func TestTradeoffers(t *testing.T) {
 		}
 	}
 
-	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Status != string(account.ACTIVE) ||
-		tradeoffersresp[1].Type != string(account.CSGO_CASE) {
+	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Status != account.ACTIVE ||
+		tradeoffersresp[1].Type != account.CSGO_CASE {
 		t.Fatalf("got: %s", body)
 	}
 }
@@ -104,8 +104,8 @@ func TestPurchases(t *testing.T) {
 		}
 	}
 
-	if len(purchasesresp) != 2 || purchasesresp[0].Status != string(account.UNPAID) ||
-		purchasesresp[1].Type != string(account.CSGO_KEY) {
+	if len(purchasesresp) != 2 || purchasesresp[0].Status != account.UNPAID ||
+		purchasesresp[1].Type != account.CSGO_KEY {
 		t.Fatalf("got: %s", body)
 	}
 }

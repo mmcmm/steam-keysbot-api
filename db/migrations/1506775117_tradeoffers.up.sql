@@ -6,8 +6,8 @@ CREATE TABLE tradeoffers
   user_steam_id     BIGINT                                 NOT NULL
     CONSTRAINT tradeoffers_user_steam_id_foreign
     REFERENCES users,
-  type              VARCHAR(25)                            NOT NULL,
-  status            VARCHAR(25)                            NOT NULL,
+  type              INTEGER                                NOT NULL,
+  status            INTEGER                                NOT NULL,
   merchant_steam_id BIGINT,
   steam_offer_id    BIGINT,
   failure_details   VARCHAR(255),
