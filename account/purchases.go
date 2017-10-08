@@ -17,7 +17,7 @@ type PurchasesResponse struct {
 	Amount         uint32  `json:"amount" validate:"min=1"`
 	UnitPrice      float64 `json:"unit_price" validate:"nonzero"`
 	PaymentAddress string  `json:"payment_address" validate:"nonzero"`
-	USDRate        float64 `json:"usd_price" validate:"nonzero"`
+	USDRate        float64 `json:"usd_rate" validate:"nonzero"`
 	Currency       uint8   `json:"currency" validate:"nonzero"`
 	USDTotal       float64 `json:"usd_total" validate:"nonzero"`
 	CryptoTotal    float64 `json:"crypto_total" validate:"nonzero"`
@@ -32,7 +32,7 @@ func (rd *PurchasesResponse) Render(w http.ResponseWriter, r *http.Request) erro
 func PurchasesHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
-	rows, err := dbconn.Query(`SELECT status, type, amount, unit_price, payment_address, usd_price, 
+	rows, err := dbconn.Query(`SELECT status, type, amount, unit_price, payment_address, usd_rate, 
 		currency, usd_total, crypto_total, created_at FROM purchases WHERE user_steam_id = $1`,
 		claims["id"])
 	if err != nil {

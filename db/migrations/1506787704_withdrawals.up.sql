@@ -12,7 +12,7 @@ CREATE TABLE withdrawals
     REFERENCES tradeoffers,
   status          VARCHAR(25)                          NOT NULL,  
   payment_address VARCHAR(60)                          NOT NULL,
-  usd_price       NUMERIC(10, 2)                       NOT NULL,
+  usd_rate        NUMERIC(10, 2)                       NOT NULL,
   amount          NUMERIC(10, 8)                       NOT NULL,
   txhash          VARCHAR(80)                          NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL

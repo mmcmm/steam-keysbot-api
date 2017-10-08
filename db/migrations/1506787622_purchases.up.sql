@@ -15,7 +15,7 @@ CREATE TABLE purchases
   amount          INTEGER                                NOT NULL,
   unit_price      NUMERIC(10, 2)                         NOT NULL,
   payment_address VARCHAR(60),
-  usd_price       NUMERIC(10, 2)                         NOT NULL,
+  usd_rate        NUMERIC(10, 2)                         NOT NULL,
   currency        INTEGER                                NOT NULL,
   usd_total       NUMERIC(10, 2)                         NOT NULL,
   crypto_total    NUMERIC(10, 8)                         NOT NULL,
