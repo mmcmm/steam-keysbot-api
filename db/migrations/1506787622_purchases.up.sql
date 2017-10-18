@@ -10,7 +10,7 @@ CREATE TABLE purchases
   tradeoffer_id   BIGINT                                 NOT NULL
     CONSTRAINT purchases_tradeoffer_id_foreign
     REFERENCES tradeoffers,
-  status          INTEGER                                NOT NULL,
+  status          INTEGER DEFAULT 9 /* PENDING */        NOT NULL,
   type            INTEGER                                NOT NULL,
   amount          INTEGER                                NOT NULL,
   unit_price      NUMERIC(10, 2)                         NOT NULL,
@@ -25,8 +25,6 @@ CREATE INDEX purchases_user_steam_id_index
   ON purchases (user_steam_id);
 CREATE INDEX purchases_tradeoffer_id_index
   ON purchases (tradeoffer_id);
-CREATE INDEX purchases_payment_address_index
-  ON purchases (payment_address);  
 
 
 CREATE OR REPLACE FUNCTION stats_money_transacted_increment()

@@ -10,7 +10,7 @@ CREATE TABLE withdrawals
   tradeoffer_id   BIGINT
     CONSTRAINT withdrawals_tradeoffer_id_foreign
     REFERENCES tradeoffers,
-  status          VARCHAR(25)                            NOT NULL,
+  status          INTEGER DEFAULT 9 /* PENDING */        NOT NULL,
   payment_address VARCHAR(60)                            NOT NULL,
   usd_rate        NUMERIC(10, 2)                         NOT NULL,
   amount          NUMERIC(10, 8)                         NOT NULL,
@@ -20,6 +20,4 @@ CREATE TABLE withdrawals
 CREATE INDEX withdrawals_user_steam_id_index
   ON withdrawals (user_steam_id);
 CREATE INDEX withdrawals_tradeoffer_id_index
-  ON withdrawals (tradeoffer_id);
-CREATE INDEX withdrawals_payment_address_index
-  ON withdrawals (payment_address);  
+  ON withdrawals (tradeoffer_id);  

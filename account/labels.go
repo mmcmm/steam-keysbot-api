@@ -16,6 +16,7 @@ const (
 	DECLINED
 	COMPLETED
 	UNPAID
+	PENDING
 )
 
 const (
