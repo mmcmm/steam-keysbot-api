@@ -10,3 +10,12 @@ func BlockchainInfoKey() string {
 	}
 	return key
 }
+
+// BlockchainInfoSecret private API key from env
+func BlockchainInfoSecret() string {
+	key := os.Getenv("KEYC_BCI_SECRET")
+	if key == "" {
+		key = "ow4sh8LBq"
+	}
+	return key
+}
