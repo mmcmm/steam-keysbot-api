@@ -123,16 +123,61 @@ func setupTestUserData(dbconn *sql.DB) string {
 	 VALUES (2, $1, $2, $3, $4, $5)`, testSteamID, account.CSGO_CASE, account.ACTIVE, "failuredetails2", 2)
 
 	_, err = dbconn.Exec(`INSERT INTO purchases (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
-		payment_address, usd_rate, currency, usd_total, crypto_total)
-	 VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, testSteamID, 1, account.UNPAID, account.CSGO_KEY,
+		payment_address, usd_rate, currency, usd_total, crypto_total) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+		testSteamID, 1, account.UNPAID, account.CSGO_KEY,
 		1, 1.86, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 4.3343, account.BTC, 200, 0.00425076)
 	_, err = dbconn.Exec(`INSERT INTO purchases (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
-			payment_address, usd_rate, currency, usd_total, crypto_total)
-		 VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, testSteamID, 2, account.UNPAID, account.CSGO_KEY,
+			payment_address, usd_rate, currency, usd_total, crypto_total) VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+		testSteamID, 2, account.UNPAID, account.CSGO_KEY,
 		2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, account.BTC, 200, 0.00568021)
 
+	_, err = dbconn.Exec(`INSERT INTO withdrawals (
+		id, 
+		user_steam_id, 
+		tradeoffer_id, 
+		status, 
+		payment_address, 
+		usd_rate, 
+		currency, 
+		usd_total, 
+		crypto_total, 
+		txhash) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		testSteamID,
+		1,
+		account.PENDING,
+		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
+		5.2212,
+		account.BTC,
+		20.21,
+		0.00568021,
+		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
+	)
+	_, err = dbconn.Exec(`INSERT INTO withdrawals (
+		id, 
+		user_steam_id, 
+		tradeoffer_id, 
+		status,
+		payment_address, 
+		usd_rate, 
+		currency, 
+		usd_total, 
+		crypto_total, 
+		txhash
+		) 
+		VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		testSteamID,
+		2,
+		account.PENDING,
+		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
+		4.2212,
+		account.BTC,
+		26.21,
+		0.00868021,
+		"z3XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
+	)
+
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ddddd: %v\n", err)
+		fmt.Fprintf(os.Stderr, "failed to add test data: %v\n", err)
 		os.Exit(1)
 	}
 

@@ -13,7 +13,9 @@ CREATE TABLE withdrawals
   status          INTEGER DEFAULT 9 /* PENDING */        NOT NULL,
   payment_address VARCHAR(60)                            NOT NULL,
   usd_rate        NUMERIC(10, 2)                         NOT NULL,
-  amount          NUMERIC(10, 8)                         NOT NULL,
+  currency        INTEGER                                NOT NULL,
+  usd_total       NUMERIC(10, 2)                         NOT NULL,
+  crypto_total    NUMERIC(10, 8)                         NOT NULL,
   txhash          VARCHAR(80)                            NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
