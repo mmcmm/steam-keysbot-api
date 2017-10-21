@@ -8,6 +8,7 @@ import (
 	"github.com/mtdx/keyc/keys"
 	"github.com/mtdx/keyc/openid/steamauth"
 	"github.com/mtdx/keyc/steam"
+	"github.com/mtdx/keyc/vault"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -27,12 +28,8 @@ func addRoutes() {
 		r.Group(func(r chi.Router) {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
-			r.Route("/account", func(r chi.Router) {
-				r.Get("/", account.InfoHandler)
-
-				r.Get("/withdrawals", account.WithdrawalsHandler)
-				// r.Post("/withdrawals", account.RequestWithdrawalHandler)
-			})
+			r.Get("/account", account.InfoHandler)
+			r.Get("/withdrawals", vault.WithdrawalsHandler)
 			r.Get("/tradeoffers", steam.TradeoffersHandler)
 			r.Get("/keys-transactions", keys.TransactionsHandler)
 		})

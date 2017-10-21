@@ -16,6 +16,7 @@ import (
 	"github.com/mtdx/keyc/openid/steamauth"
 	"github.com/mtdx/keyc/steam"
 	"github.com/mtdx/keyc/validator"
+	"github.com/mtdx/keyc/vault"
 )
 
 const testSteamID = "11111111111111111"
@@ -114,14 +115,14 @@ func TestPurchases(t *testing.T) {
 }
 
 func TestWithdrawalsAuthRequired(t *testing.T) {
-	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account/withdrawals")
+	common.AssertAuthRequired(t, ts, "GET", "/api/v1/withdrawals")
 }
 
 func TestWithdrawals(t *testing.T) {
 	t.Parallel()
 
-	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account/withdrawals", nil, jwt)
-	withdrawalsresp := make([]account.WithdrawalsResponse, 2)
+	_, body = common.TestRequest(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
+	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
 	if err := json.Unmarshal([]byte(body), &withdrawalsresp); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
 	}
