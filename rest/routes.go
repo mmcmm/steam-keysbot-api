@@ -27,9 +27,13 @@ func addRoutes() {
 			r.Use(jwtauth.Authenticator)
 			r.Route("/account", func(r chi.Router) {
 				r.Get("/", account.InfoHandler)
+
 				r.Get("/tradeoffers", account.TradeoffersHandler)
+
 				r.Get("/purchases", account.PurchasesHandler)
+
 				r.Get("/withdrawals", account.WithdrawalsHandler)
+				// r.Post("/withdrawals", account.RequestWithdrawalHandler)
 			})
 		})
 	})
