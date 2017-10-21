@@ -29,6 +29,7 @@ func addRoutes() {
 				r.Get("/", account.InfoHandler)
 				r.Get("/tradeoffers", account.TradeoffersHandler)
 				r.Get("/purchases", account.PurchasesHandler)
+				r.Get("/withdrawals", account.WithdrawalsHandler)
 			})
 		})
 	})

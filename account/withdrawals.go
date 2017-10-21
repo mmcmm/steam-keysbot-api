@@ -39,8 +39,16 @@ func WithdrawalsHandler(w http.ResponseWriter, r *http.Request) {
 	withdrawalsresp := []render.Renderer{}
 	for rows.Next() {
 		resp := &WithdrawalsResponse{}
-		if err := rows.Scan(&resp.Status, &resp.PaymentAddress, &resp.UsdRate, &resp.Currency, &resp.USDTotal,
-			&resp.CryptoTotal, &resp.Txhash, &resp.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&resp.Status,
+			&resp.PaymentAddress,
+			&resp.UsdRate,
+			&resp.Currency,
+			&resp.USDTotal,
+			&resp.CryptoTotal,
+			&resp.Txhash,
+			&resp.CreatedAt,
+		); err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
 		}

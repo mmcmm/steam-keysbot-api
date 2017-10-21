@@ -110,6 +110,31 @@ func TestPurchases(t *testing.T) {
 	}
 }
 
+func TestWithdrawalsAuthRequired(t *testing.T) {
+	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account/withdrawals")
+}
+
+func TestWithdrawals(t *testing.T) {
+	t.Parallel()
+
+	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account/withdrawals", nil, jwt)
+	withdrawalsresp := make([]account.WithdrawalsResponse, 2)
+	if err := json.Unmarshal([]byte(body), &withdrawalsresp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+
+	for _, withdrawal := range withdrawalsresp {
+		if err := validator.Validate(withdrawal); err != nil {
+			t.Fatalf("got: %s", err.Error())
+		}
+	}
+
+	if len(withdrawalsresp) != 2 || withdrawalsresp[0].Status != account.PENDING ||
+		withdrawalsresp[1].Currency != account.BTC {
+		t.Fatalf("got: %s", body)
+	}
+}
+
 func setupTestUserData(dbconn *sql.DB) string {
 	jwt, err = steamauth.SaveUser(dbconn, testSteamID, "PersonaName", "https://avatar.com/img.jpg")
 	if err != nil {
