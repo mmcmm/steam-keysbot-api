@@ -55,7 +55,12 @@ func WithdrawalsHandler(w http.ResponseWriter, r *http.Request) {
 		withdrawalsresp = append(withdrawalsresp, resp)
 	}
 
-	common.RenderResults(w, r, withdrawalsresp, rows, err)
+	if err := rows.Err(); err != nil {
+		render.Render(w, r, common.ErrInternalServer(err))
+		return
+	}
+
+	common.RenderResults(w, r, withdrawalsresp, err)
 }
 
 // RequestWithdrawalHandler put /withdrawal

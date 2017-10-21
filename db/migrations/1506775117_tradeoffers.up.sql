@@ -14,6 +14,7 @@ CREATE TABLE tradeoffers
   user_items        VARCHAR(255),
   bot_items         VARCHAR(255),
   amount            INTEGER                                NOT NULL,
+  app_id            INTEGER                                NOT NULL,
   created_at        TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 CREATE INDEX tradeoffers_user_steam_id_index

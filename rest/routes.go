@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/mtdx/keyc/account"
+	"github.com/mtdx/keyc/keys"
 	"github.com/mtdx/keyc/openid/steamauth"
+	"github.com/mtdx/keyc/steam"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -28,13 +30,11 @@ func addRoutes() {
 			r.Route("/account", func(r chi.Router) {
 				r.Get("/", account.InfoHandler)
 
-				r.Get("/tradeoffers", account.TradeoffersHandler)
-
-				r.Get("/purchases", account.PurchasesHandler)
-
 				r.Get("/withdrawals", account.WithdrawalsHandler)
 				// r.Post("/withdrawals", account.RequestWithdrawalHandler)
 			})
+			r.Get("/tradeoffers", steam.TradeoffersHandler)
+			r.Get("/keys-transactions", keys.TransactionsHandler)
 		})
 	})
 }

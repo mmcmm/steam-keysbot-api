@@ -1,7 +1,6 @@
 package common
 
 import (
-	"database/sql"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -52,12 +51,7 @@ func AssertAuthRequired(t *testing.T, ts *httptest.Server, method string, route 
 }
 
 // RenderResults ... renders `multiple` results
-func RenderResults(w http.ResponseWriter, r *http.Request, resp []render.Renderer, rows *sql.Rows, err error) {
-	if err := rows.Err(); err != nil {
-		render.Render(w, r, common.ErrInternalServer(err))
-		return
-	}
-
+func RenderResults(w http.ResponseWriter, r *http.Request, resp []render.Renderer, err error) {
 	for _, entry := range resp {
 		if err := validator.Validate(entry); err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
