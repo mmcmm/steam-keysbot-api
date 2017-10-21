@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"github.com/mtdx/keyc/common"
-	"github.com/mtdx/keyc/validator"
 )
 
 // PurchasesResponse ...
@@ -33,8 +32,7 @@ func PurchasesHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
 	rows, err := dbconn.Query(`SELECT status, type, amount, unit_price, payment_address, usd_rate, 
-		currency, usd_total, crypto_total, created_at FROM purchases WHERE user_steam_id = $1`,
-		claims["id"])
+		currency, usd_total, crypto_total, created_at FROM purchases WHERE user_steam_id = $1`, claims["id"])
 	if err != nil {
 		render.Render(w, r, common.ErrInternalServer(err))
 		return
@@ -43,26 +41,23 @@ func PurchasesHandler(w http.ResponseWriter, r *http.Request) {
 	purchasesresp := []render.Renderer{}
 	for rows.Next() {
 		resp := &PurchasesResponse{}
-		if err := rows.Scan(&resp.Status, &resp.Type, &resp.Amount, &resp.UnitPrice, &resp.PaymentAddress,
-			&resp.USDRate, &resp.Currency, &resp.USDTotal, &resp.CryptoTotal, &resp.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&resp.Status,
+			&resp.Type,
+			&resp.Amount,
+			&resp.UnitPrice,
+			&resp.PaymentAddress,
+			&resp.USDRate,
+			&resp.Currency,
+			&resp.USDTotal,
+			&resp.CryptoTotal,
+			&resp.CreatedAt,
+		); err != nil {
 			render.Render(w, r, common.ErrInternalServer(err))
 			return
 		}
 		purchasesresp = append(purchasesresp, resp)
 	}
-	if err := rows.Err(); err != nil {
-		render.Render(w, r, common.ErrInternalServer(err))
-		return
-	}
 
-	for _, purchase := range purchasesresp {
-		if err := validator.Validate(purchase); err != nil {
-			render.Render(w, r, common.ErrInternalServer(err))
-		}
-	}
-
-	render.Status(r, http.StatusOK)
-	if err := render.RenderList(w, r, purchasesresp); err != nil {
-		render.Render(w, r, common.ErrRender(err))
-	}
+	common.RenderResults(w, r, purchasesresp, rows, err)
 }

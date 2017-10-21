@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"github.com/mtdx/keyc/common"
-	"github.com/mtdx/keyc/validator"
 )
 
 // TradeoffersResponse ...
@@ -43,19 +42,6 @@ func TradeoffersHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		tradeoffersresp = append(tradeoffersresp, resp)
 	}
-	if err := rows.Err(); err != nil {
-		render.Render(w, r, common.ErrInternalServer(err))
-		return
-	}
 
-	for _, tradeoffer := range tradeoffersresp {
-		if err := validator.Validate(tradeoffer); err != nil {
-			render.Render(w, r, common.ErrInternalServer(err))
-		}
-	}
-
-	render.Status(r, http.StatusOK)
-	if err := render.RenderList(w, r, tradeoffersresp); err != nil {
-		render.Render(w, r, common.ErrRender(err))
-	}
+	common.RenderResults(w, r, tradeoffersresp, rows, err)
 }
