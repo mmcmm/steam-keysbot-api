@@ -1,6 +1,19 @@
 package steam
 
-import "database/sql"
+import (
+	"database/sql"
+	"net/http"
+)
+
+// Render pre-processing after a decoding.
+func (to *TradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+// Bind post-processing after a decoding.
+func (to *TradeoffersResponse) Bind(r *http.Request) error {
+	return nil
+}
 
 // TradeoffersResponse ...
 type TradeoffersResponse struct {

@@ -1,5 +1,17 @@
 package keys
 
+import "net/http"
+
+// Render pre-processing after a decoding.
+func (tr *TransactionsResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+// Bind post-processing after a decoding.
+func (tr *TransactionsResponse) Bind(r *http.Request) error {
+	return nil
+}
+
 // TransactionsResponse ...
 type TransactionsResponse struct {
 	Status         uint8   `json:"status" validate:"nonzero"`

@@ -4,12 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/mtdx/keyc/account"
-	"github.com/mtdx/keyc/common"
 	"github.com/mtdx/keyc/db"
 	"github.com/mtdx/keyc/keys"
 	"github.com/mtdx/keyc/labels"
@@ -24,6 +27,41 @@ const testSteamID = "11111111111111111"
 var ts *httptest.Server
 var body, jwt string
 var err error
+
+func callEndpoint(t *testing.T, ts *httptest.Server, method, path string, body io.Reader, jwt string) (*http.Response, string) {
+	req, err := http.NewRequest(method, ts.URL+path, body)
+	if err != nil {
+		t.Fatal(err)
+		return nil, ""
+	}
+
+	if jwt != "" {
+		req.Header.Add("Authorization", "BEARER "+jwt)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+		return nil, ""
+	}
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+		return nil, ""
+	}
+	defer resp.Body.Close()
+
+	return resp, string(respBody)
+}
+
+func assertAuthRequired(t *testing.T, ts *httptest.Server, method string, route string) {
+	t.Parallel()
+	_, body := callEndpoint(t, ts, method, route, nil, "jwt-test")
+	if strings.Compare(strings.TrimSpace(body), `Unauthorized`) != 0 {
+		t.Fatalf("got: %s", body)
+	}
+}
 
 func TestMain(m *testing.M) {
 	dbconn := db.Open()
@@ -43,13 +81,13 @@ func TestMain(m *testing.M) {
 }
 
 func TestAccountSummaryAuthRequired(t *testing.T) {
-	common.AssertAuthRequired(t, ts, "GET", "/api/v1/account")
+	assertAuthRequired(t, ts, "GET", "/api/v1/account")
 }
 
 func TestAccountSummary(t *testing.T) {
 	t.Parallel()
 
-	_, body = common.TestRequest(t, ts, "GET", "/api/v1/account", nil, jwt)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/account", nil, jwt)
 	var inforesp = &account.InfoResponse{}
 	if err := json.Unmarshal([]byte(body), &inforesp); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
@@ -65,13 +103,13 @@ func TestAccountSummary(t *testing.T) {
 }
 
 func TestTradeoffersAuthRequired(t *testing.T) {
-	common.AssertAuthRequired(t, ts, "GET", "/api/v1/tradeoffers")
+	assertAuthRequired(t, ts, "GET", "/api/v1/tradeoffers")
 }
 
 func TestTradeoffers(t *testing.T) {
 	t.Parallel()
 
-	_, body = common.TestRequest(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
 	tradeoffersresp := make([]steam.TradeoffersResponse, 2)
 	if err := json.Unmarshal([]byte(body), &tradeoffersresp); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
@@ -90,13 +128,13 @@ func TestTradeoffers(t *testing.T) {
 }
 
 func TestPurchasesAuthRequired(t *testing.T) {
-	common.AssertAuthRequired(t, ts, "GET", "/api/v1/keys-transactions")
+	assertAuthRequired(t, ts, "GET", "/api/v1/keys-transactions")
 }
 
 func TestPurchases(t *testing.T) {
 	t.Parallel()
 
-	_, body = common.TestRequest(t, ts, "GET", "/api/v1/keys-transactions", nil, jwt)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/keys-transactions", nil, jwt)
 	purchasesresp := make([]keys.TransactionsResponse, 2)
 	if err := json.Unmarshal([]byte(body), &purchasesresp); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
@@ -115,13 +153,13 @@ func TestPurchases(t *testing.T) {
 }
 
 func TestWithdrawalsAuthRequired(t *testing.T) {
-	common.AssertAuthRequired(t, ts, "GET", "/api/v1/withdrawals")
+	assertAuthRequired(t, ts, "GET", "/api/v1/withdrawals")
 }
 
 func TestWithdrawals(t *testing.T) {
 	t.Parallel()
 
-	_, body = common.TestRequest(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
 	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
 	if err := json.Unmarshal([]byte(body), &withdrawalsresp); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())

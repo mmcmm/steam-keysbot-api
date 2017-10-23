@@ -37,3 +37,13 @@ func findAllWithdrawals(dbconn *sql.DB, id interface{}) ([]render.Renderer, erro
 
 	return withdrawalsresp, nil
 }
+
+// func saveWithdrawal(withdrawal interface{}, r *http.Request) {
+// 	data := &WithdrawalsRequest{}
+// 	if err := render.Bind(r, data); err != nil {
+// 		render.Render(w, r, common.ErrInvalidRequest(err))
+// 		return
+// 	}
+// 	withdrawal := data.Withdrawal
+// 	dbNewArticle(article)
+// }
