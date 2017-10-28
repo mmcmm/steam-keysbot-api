@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -26,6 +27,7 @@ const testSteamID = "11111111111111111"
 
 var ts *httptest.Server
 var body, jwt string
+var jsonresp []byte
 var err error
 
 func callEndpoint(t *testing.T, ts *httptest.Server, method, path string, body io.Reader, jwt string) (*http.Response, string) {
@@ -158,6 +160,19 @@ func TestWithdrawalsAuthRequired(t *testing.T) {
 
 func TestWithdrawals(t *testing.T) {
 	t.Parallel()
+
+	withdrawalreq1 := &vault.WithdrawalsRequest{
+		PaymentAddress: "1Gj4mwxWC8W9yhnrK5fVfYC2oV1jNdpiCS",
+		CryptoTotal:    0.00041839,
+	}
+	withdrawalreq2 := &vault.WithdrawalsRequest{
+		PaymentAddress: "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
+		CryptoTotal:    0.00086091,
+	}
+	jsonresp, _ = json.Marshal(withdrawalreq1)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", bytes.NewReader(jsonresp), jwt)
+	jsonresp, _ = json.Marshal(withdrawalreq2)
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", bytes.NewReader(jsonresp), jwt)
 
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
 	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
