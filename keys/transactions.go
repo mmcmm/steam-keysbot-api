@@ -8,10 +8,6 @@ import (
 	"github.com/mtdx/keyc/common"
 )
 
-func (tr *TransactionsResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
 // TransactionsHandler rest route handler
 func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())

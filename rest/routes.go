@@ -29,9 +29,11 @@ func addRoutes() {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
 			r.Get("/account", account.InfoHandler)
-			r.Get("/withdrawals", vault.WithdrawalsHandler)
 			r.Get("/tradeoffers", steam.TradeoffersHandler)
 			r.Get("/keys-transactions", keys.TransactionsHandler)
+
+			r.Get("/withdrawals", vault.WithdrawalsHandler)
+			r.Post("/withdrawals", vault.WithdrawalRequestHandler)
 		})
 	})
 }

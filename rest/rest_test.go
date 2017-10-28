@@ -196,51 +196,6 @@ func setupTestUserData(dbconn *sql.DB) string {
 			payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
 		testSteamID, 2, labels.UNPAID, labels.CSGO_KEY, 2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, labels.BTC, 200, 0.00568021, labels.CSGO_APP_ID)
 
-	_, err = dbconn.Exec(`INSERT INTO withdrawals (
-		id, 
-		user_steam_id, 
-		tradeoffer_id, 
-		status, 
-		payment_address, 
-		usd_rate, 
-		currency, 
-		usd_total, 
-		crypto_total, 
-		txhash) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-		testSteamID,
-		1,
-		labels.PENDING,
-		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
-		5.2212,
-		labels.BTC,
-		20.21,
-		0.00568021,
-		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
-	)
-	_, err = dbconn.Exec(`INSERT INTO withdrawals (
-		id, 
-		user_steam_id, 
-		tradeoffer_id, 
-		status,
-		payment_address, 
-		usd_rate, 
-		currency, 
-		usd_total, 
-		crypto_total, 
-		txhash
-		) 
-		VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-		testSteamID,
-		2,
-		labels.PENDING,
-		"13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
-		4.2212,
-		labels.BTC,
-		26.21,
-		0.00868021,
-		"z3XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb",
-	)
-
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to add test data: %v\n", err)
 		os.Exit(1)
