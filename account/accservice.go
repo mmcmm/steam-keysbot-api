@@ -9,10 +9,9 @@ import (
 
 func getAccountInfo(dbconn *sql.DB, id interface{}) (render.Renderer, error) {
 	inforesp := &InfoResponse{}
-	err := dbconn.QueryRow(`SELECT bitcoin_balance, csgokey_balance, trade_link_url 
+	err := dbconn.QueryRow(`SELECT bitcoin_balance, trade_link_url 
 		FROM users WHERE steam_id = $1`, id).Scan(
 		&inforesp.BitcoinBalance,
-		&inforesp.CsgokeyBalance,
 		&inforesp.TradeLinkURL,
 	)
 	if err != nil || err == sql.ErrNoRows {

@@ -95,8 +95,7 @@ func AccountSummaryCheck(t *testing.T, bitcoinBalance float64, csgokeyBalance ui
 		t.Fatalf("got: %s", err.Error())
 	}
 
-	if inforesp.BitcoinBalance != bitcoinBalance || inforesp.CsgokeyBalance != csgokeyBalance ||
-		inforesp.TradeLinkURL.String != tradeLinik {
+	if inforesp.BitcoinBalance != bitcoinBalance || inforesp.TradeLinkURL.String != tradeLinik {
 		t.Fatalf("got: %s", body)
 	}
 }
