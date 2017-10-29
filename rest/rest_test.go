@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func AccountSummaryCheck(t *testing.T, bitcoinBalance float64, csgokeyBalance uint32, tradeLinik string) {
+func AccountSummaryCheck(t *testing.T, bitcoinBalance float64, tradeLinik string) {
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/account", nil, jwt)
 	var inforesp = &account.InfoResponse{}
 	if err := json.Unmarshal([]byte(body), &inforesp); err != nil {
@@ -106,7 +106,7 @@ func TestAccountSummaryAuthRequired(t *testing.T) {
 func TestAccountSummary(t *testing.T) {
 	t.Parallel()
 
-	AccountSummaryCheck(t, 1, 0, "")
+	AccountSummaryCheck(t, 1, "")
 }
 
 func TestTradeoffersAuthRequired(t *testing.T) {
@@ -214,7 +214,7 @@ func TestWithdrawals(t *testing.T) {
 	}
 
 	// test balance change
-	AccountSummaryCheck(t, 1-bb1-bb2, 0, "")
+	AccountSummaryCheck(t, 1-bb1-bb2, "")
 }
 
 func setupTestUserData(dbconn *sql.DB) string {
