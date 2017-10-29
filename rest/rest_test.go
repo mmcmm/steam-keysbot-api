@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mtdx/keyc/common"
+
 	"github.com/mtdx/keyc/account"
 	"github.com/mtdx/keyc/db"
 	"github.com/mtdx/keyc/keys"
@@ -27,7 +29,7 @@ const testSteamID = "11111111111111111"
 
 var ts *httptest.Server
 var body, jwt string
-var jsonresp []byte
+var jsonreq []byte
 var err error
 
 func callEndpoint(t *testing.T, ts *httptest.Server, method, path string, body io.Reader, jwt string) (*http.Response, string) {
@@ -82,13 +84,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestAccountSummaryAuthRequired(t *testing.T) {
-	assertAuthRequired(t, ts, "GET", "/api/v1/account")
-}
-
-func TestAccountSummary(t *testing.T) {
-	t.Parallel()
-
+func AccountSummaryCheck(t *testing.T, bitcoinBalance float64, csgokeyBalance uint32, tradeLinik string) {
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/account", nil, jwt)
 	var inforesp = &account.InfoResponse{}
 	if err := json.Unmarshal([]byte(body), &inforesp); err != nil {
@@ -99,9 +95,19 @@ func TestAccountSummary(t *testing.T) {
 		t.Fatalf("got: %s", err.Error())
 	}
 
-	if inforesp.BitcoinBalance != 0 || inforesp.CsgokeyBalance != 0 || inforesp.TradeLinkURL.String != "" {
+	if inforesp.BitcoinBalance != bitcoinBalance || inforesp.CsgokeyBalance != csgokeyBalance ||
+		inforesp.TradeLinkURL.String != tradeLinik {
 		t.Fatalf("got: %s", body)
 	}
+}
+func TestAccountSummaryAuthRequired(t *testing.T) {
+	assertAuthRequired(t, ts, "GET", "/api/v1/account")
+}
+
+func TestAccountSummary(t *testing.T) {
+	t.Parallel()
+
+	AccountSummaryCheck(t, 1, 0, "")
 }
 
 func TestTradeoffersAuthRequired(t *testing.T) {
@@ -161,18 +167,34 @@ func TestWithdrawalsAuthRequired(t *testing.T) {
 func TestWithdrawals(t *testing.T) {
 	t.Parallel()
 
+	bb1 := 0.00041839
+	bb2 := 0.00086091
 	withdrawalreq1 := &vault.WithdrawalsRequest{
 		PaymentAddress: "1Gj4mwxWC8W9yhnrK5fVfYC2oV1jNdpiCS",
-		CryptoTotal:    0.00041839,
+		CryptoTotal:    bb1,
 	}
 	withdrawalreq2 := &vault.WithdrawalsRequest{
 		PaymentAddress: "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
-		CryptoTotal:    0.00086091,
+		CryptoTotal:    bb2,
 	}
-	jsonresp, _ = json.Marshal(withdrawalreq1)
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", bytes.NewReader(jsonresp), jwt)
-	jsonresp, _ = json.Marshal(withdrawalreq2)
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", bytes.NewReader(jsonresp), jwt)
+	withdrawalreq3 := &vault.WithdrawalsRequest{
+		PaymentAddress: "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
+		CryptoTotal:    1,
+	}
+	jsonreq, _ = json.Marshal(withdrawalreq1)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
+	jsonreq, _ = json.Marshal(withdrawalreq2)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
+	jsonreq, _ = json.Marshal(withdrawalreq3)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
+
+	var errLowBalance common.ErrResponse
+	if err := json.Unmarshal([]byte(body), &errLowBalance); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	if errLowBalance.ErrorText != "Not enough balance" {
+		t.Fatalf("Failed to reject withdrawal, got %s", errLowBalance.StatusText)
+	}
 
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
 	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
@@ -187,9 +209,13 @@ func TestWithdrawals(t *testing.T) {
 	}
 
 	if len(withdrawalsresp) != 2 || withdrawalsresp[0].Status != labels.PENDING ||
-		withdrawalsresp[1].Currency != labels.BTC {
+		withdrawalsresp[1].Currency != labels.BTC || withdrawalsresp[0].CryptoTotal != bb2 ||
+		withdrawalsresp[1].CryptoTotal != bb1 {
 		t.Fatalf("got: %s", body)
 	}
+
+	// test balance change
+	AccountSummaryCheck(t, 1-bb1-bb2, 0, "")
 }
 
 func setupTestUserData(dbconn *sql.DB) string {
@@ -210,6 +236,8 @@ func setupTestUserData(dbconn *sql.DB) string {
 	_, err = dbconn.Exec(`INSERT INTO key_transactions (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
 			payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
 		testSteamID, 2, labels.UNPAID, labels.CSGO_KEY, 2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, labels.BTC, 200, 0.00568021, labels.CSGO_APP_ID)
+
+	_, err = dbconn.Exec(`UPDATE users SET bitcoin_balance = 1 WHERE steam_id = $1`, testSteamID)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to add test data: %v\n", err)
