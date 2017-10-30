@@ -13,11 +13,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mtdx/keyc/config"
+
 	"github.com/mtdx/keyc/common"
 
 	"github.com/mtdx/keyc/account"
 	"github.com/mtdx/keyc/db"
-	"github.com/mtdx/keyc/keys"
 	"github.com/mtdx/keyc/labels"
 	"github.com/mtdx/keyc/openid/steamauth"
 	"github.com/mtdx/keyc/steam"
@@ -116,6 +117,43 @@ func TestTradeoffersAuthRequired(t *testing.T) {
 func TestTradeoffers(t *testing.T) {
 	t.Parallel()
 
+	tradeofferreq1 := &steam.TradeoffersRequest{
+		SteamID: testSteamID,
+		Status:  labels.ACTIVE,
+		Type:    labels.CSGO_KEY,
+		Amount:  2,
+		AppID:   730,
+	}
+	tradeofferreq2 := &steam.TradeoffersRequest{
+		SteamID: testSteamID,
+		Status:  labels.ACCEPTED,
+		Type:    labels.CSGO_KEY,
+		Amount:  4,
+		AppID:   730,
+	}
+	jsonreq, _ = json.Marshal(tradeofferreq1)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+	jsonreq, _ = json.Marshal(tradeofferreq2)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+
+	var successResp common.SuccessResponse
+	if err := json.Unmarshal([]byte(body), &successResp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	if successResp.StatusText != "Tradeoffer has been created" {
+		t.Fatalf("got: %s", successResp.StatusText+" | "+successResp.SuccessText)
+	}
+
+	jsonreq, _ = json.Marshal(tradeofferreq2)
+	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers", bytes.NewReader(jsonreq), jwt)
+	var errResp common.ErrResponse
+	if err := json.Unmarshal([]byte(body), &errResp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	if errResp.StatusText != "Invalid request" {
+		t.Fatalf("got: %s", errResp.StatusText)
+	}
+
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
 	tradeoffersresp := make([]steam.TradeoffersResponse, 2)
 	if err := json.Unmarshal([]byte(body), &tradeoffersresp); err != nil {
@@ -129,35 +167,35 @@ func TestTradeoffers(t *testing.T) {
 	}
 
 	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Status != labels.ACTIVE ||
-		tradeoffersresp[1].Type != labels.CSGO_CASE {
+		tradeoffersresp[1].Type != labels.CSGO_KEY || tradeoffersresp[0].Amount != 4 {
 		t.Fatalf("got: %s", body)
 	}
 }
 
-func TestPurchasesAuthRequired(t *testing.T) {
-	assertAuthRequired(t, ts, "GET", "/api/v1/keys-transactions")
-}
+// func TestKeysTransactionsAuthRequired(t *testing.T) {
+// 	assertAuthRequired(t, ts, "GET", "/api/v1/keys-transactions")
+// }
 
-func TestPurchases(t *testing.T) {
-	t.Parallel()
+// func TestKeysTransactions(t *testing.T) {
+// 	t.Parallel()
 
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/keys-transactions", nil, jwt)
-	purchasesresp := make([]keys.TransactionsResponse, 2)
-	if err := json.Unmarshal([]byte(body), &purchasesresp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
+// 	_, body = callEndpoint(t, ts, "GET", "/api/v1/keys-transactions", nil, jwt)
+// 	purchasesresp := make([]keys.TransactionsResponse, 2)
+// 	if err := json.Unmarshal([]byte(body), &purchasesresp); err != nil {
+// 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+// 	}
 
-	for _, purchase := range purchasesresp {
-		if err := validator.Validate(purchase); err != nil {
-			t.Fatalf("got: %s", err.Error())
-		}
-	}
+// 	for _, purchase := range purchasesresp {
+// 		if err := validator.Validate(purchase); err != nil {
+// 			t.Fatalf("got: %s", err.Error())
+// 		}
+// 	}
 
-	if len(purchasesresp) != 2 || purchasesresp[0].Status != labels.UNPAID ||
-		purchasesresp[1].Type != labels.CSGO_KEY {
-		t.Fatalf("got: %s", body)
-	}
-}
+// 	if len(purchasesresp) != 2 || purchasesresp[0].Status != labels.UNPAID ||
+// 		purchasesresp[1].Type != labels.CSGO_KEY {
+// 		t.Fatalf("got: %s", body)
+// 	}
+// }
 
 func TestWithdrawalsAuthRequired(t *testing.T) {
 	assertAuthRequired(t, ts, "GET", "/api/v1/withdrawals")
@@ -224,18 +262,15 @@ func setupTestUserData(dbconn *sql.DB) string {
 		os.Exit(1)
 	}
 
-	_, err = dbconn.Exec(`INSERT INTO tradeoffers (id, user_steam_id, type, status, failure_details, amount, app_id)
-	 VALUES (1, $1, $2, $3, $4, $5, $6)`, testSteamID, labels.CSGO_CASE, labels.ACTIVE, "failuredetails1", 1, labels.CSGO_APP_ID)
-	_, err = dbconn.Exec(`INSERT INTO tradeoffers (id, user_steam_id, type, status, failure_details, amount, app_id)
-	 VALUES (2, $1, $2, $3, $4, $5, $6)`, testSteamID, labels.CSGO_CASE, labels.ACTIVE, "failuredetails2", 2, labels.CSGO_APP_ID)
+	// TODO: implement
+	// _, err = dbconn.Exec(`INSERT INTO key_transactions (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
+	// 	payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+	// 	testSteamID, 1, labels.UNPAID, labels.CSGO_KEY, 1, 1.86, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 4.3343, labels.BTC, 200, 0.00425076, labels.CSGO_APP_ID)
+	// _, err = dbconn.Exec(`INSERT INTO key_transactions (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
+	// 		payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+	// 	testSteamID, 2, labels.UNPAID, labels.CSGO_KEY, 2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, labels.BTC, 200, 0.00568021, labels.CSGO_APP_ID)
 
-	_, err = dbconn.Exec(`INSERT INTO key_transactions (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
-		payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-		testSteamID, 1, labels.UNPAID, labels.CSGO_KEY, 1, 1.86, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 4.3343, labels.BTC, 200, 0.00425076, labels.CSGO_APP_ID)
-	_, err = dbconn.Exec(`INSERT INTO key_transactions (id, user_steam_id, tradeoffer_id, status, type, amount, unit_price,
-			payment_address, usd_rate, currency, usd_total, crypto_total, app_id) VALUES (2, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-		testSteamID, 2, labels.UNPAID, labels.CSGO_KEY, 2, 1.92, "13XrFK2m8tXvM5srR9tFPYsm2mpmRyAnXb", 5.2212, labels.BTC, 200, 0.00568021, labels.CSGO_APP_ID)
-
+	_, err = dbconn.Exec(`INSERT INTO steam_bots (steam_id, ip_address, display_name) VALUES ($1, $2, $3)`, testSteamID, "127.0.0.1", "testuser")
 	_, err = dbconn.Exec(`UPDATE users SET bitcoin_balance = 1 WHERE steam_id = $1`, testSteamID)
 
 	if err != nil {
@@ -250,7 +285,8 @@ func cleanTestUserData(dbconn *sql.DB) {
 	_, err = dbconn.Exec(`DELETE FROM key_transactions WHERE user_steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM withdrawals WHERE user_steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM sales WHERE user_steam_id = $1`, testSteamID)
-	_, err := dbconn.Exec(`DELETE FROM tradeoffers WHERE user_steam_id = $1`, testSteamID)
+	_, err = dbconn.Exec(`DELETE FROM tradeoffers WHERE user_steam_id = $1`, testSteamID)
+	_, err = dbconn.Exec(`DELETE FROM steam_bots WHERE steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM users WHERE steam_id = $1`, testSteamID)
 
 	if err != nil {

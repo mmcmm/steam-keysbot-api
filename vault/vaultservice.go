@@ -3,6 +3,7 @@ package vault
 import (
 	"database/sql"
 	"errors"
+	"math"
 
 	"github.com/mtdx/keyc/labels"
 
@@ -12,7 +13,7 @@ import (
 
 func findAllWithdrawals(dbconn *sql.DB, userid interface{}) ([]render.Renderer, error) {
 	rows, err := dbconn.Query(`SELECT status, payment_address, usd_rate, currency, usd_total, crypto_total,
-		txhash, created_at FROM withdrawals WHERE user_steam_id = $1`, userid)
+		txhash, created_at FROM withdrawals WHERE user_steam_id = $1 ORDER BY id DESC`, userid)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func saveWithdrawal(dbconn *sql.DB, withdrawal *WithdrawalsRequest, userid inter
 			return errors.New("Not enough balance")
 		}
 		if _, err := tx.Exec(`UPDATE users SET bitcoin_balance = bitcoin_balance - $1 WHERE steam_id = $2`,
-			withdrawal.CryptoTotal, userid); err != nil {
+			math.Abs(withdrawal.CryptoTotal), userid); err != nil {
 			return err
 		}
 		// TODO: get rate and make sure is updated recently otherwise reject and register error

@@ -18,4 +18,5 @@
 .vscode
 .idea
 debug
+debug.*
 main

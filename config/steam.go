@@ -10,3 +10,12 @@ func SteamAPIKey() string {
 	}
 	return key
 }
+
+// SteamBotsAPIKey ...
+func SteamBotsAPIKey() string {
+	key := os.Getenv("KEYC_STEAM_BOTS_API_KEY")
+	if key == "" {
+		key = "JK7GgUgxt5wTtEYLKG6VdwyUQS4kLVRpLtzy" // Insecure Default Bots API key
+	}
+	return key
+}

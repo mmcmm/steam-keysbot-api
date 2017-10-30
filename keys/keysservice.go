@@ -8,7 +8,7 @@ import (
 
 func findAllTransactions(dbconn *sql.DB, id interface{}) ([]render.Renderer, error) {
 	rows, err := dbconn.Query(`SELECT status, type, amount, unit_price, payment_address, usd_rate, 
-		currency, usd_total, crypto_total, created_at FROM key_transactions WHERE user_steam_id = $1`, id)
+		currency, usd_total, crypto_total, created_at FROM key_transactions WHERE user_steam_id = $1 ORDER BY id DESC`, id)
 	if err != nil {
 		return nil, err
 	}

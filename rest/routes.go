@@ -28,6 +28,7 @@ func addRoutes() {
 		r.Group(func(r chi.Router) {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
+
 			r.Get("/account", account.InfoHandler)
 			r.Get("/tradeoffers", steam.TradeoffersHandler)
 			r.Get("/keys-transactions", keys.TransactionsHandler)
@@ -35,6 +36,8 @@ func addRoutes() {
 			r.Get("/withdrawals", vault.WithdrawalsHandler)
 			r.Post("/withdrawals", vault.WithdrawalRequestHandler)
 		})
+		// Unprotected routes
+		r.Post("/tradeoffers", steam.TradeoffersCreateHandler)
 	})
 }
 

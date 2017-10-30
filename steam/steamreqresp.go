@@ -11,7 +11,7 @@ func (to *TradeoffersResponse) Render(w http.ResponseWriter, r *http.Request) er
 }
 
 // Bind post-processing after a decoding.
-func (to *TradeoffersResponse) Bind(r *http.Request) error {
+func (tr *TradeoffersRequest) Bind(r *http.Request) error {
 	return nil
 }
 
@@ -22,4 +22,14 @@ type TradeoffersResponse struct {
 	FailureDetails sql.NullString `json:"failure_details"`
 	Amount         uint32         `json:"amount" validate:"min=1"`
 	CreatedAt      string         `json:"created_at" validate:"nonzero"`
+}
+
+// TradeoffersRequest ...
+type TradeoffersRequest struct {
+	SteamID        string `json:"steam_id" validate:"nonzero"`
+	Status         uint8  `json:"status" validate:"nonzero"`
+	FailureDetails string `json:"failure_details"`
+	Type           uint8  `json:"type" validate:"nonzero"`
+	Amount         uint32 `json:"amount" validate:"min=1"`
+	AppID          uint   `json:"app_id" validate:"nonzero"`
 }
