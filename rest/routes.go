@@ -19,7 +19,7 @@ import (
 
 var r *chi.Mux
 
-func addRoutes() {
+func routes() {
 	tokenAuth := jwtauth.New("HS256", []byte(config.JwtKey()), nil)
 	r.Get("/login", steamauth.LoginHandler)
 
@@ -41,8 +41,8 @@ func addRoutes() {
 	})
 }
 
-// StartRouter create chi router & add the routes
-func StartRouter(dbconn *sql.DB) *chi.Mux {
+// Router create chi router & add the routes
+func Router(dbconn *sql.DB) *chi.Mux {
 	r = chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -55,7 +55,7 @@ func StartRouter(dbconn *sql.DB) *chi.Mux {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(middleware.WithValue("DBCONN", dbconn))
 
-	addRoutes()
+	routes()
 
 	return r
 }

@@ -1,29 +1,17 @@
 package rest
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 
-	"github.com/mtdx/keyc/config"
-
-	"github.com/mtdx/keyc/common"
-
-	"github.com/mtdx/keyc/account"
 	"github.com/mtdx/keyc/db"
-	"github.com/mtdx/keyc/labels"
 	"github.com/mtdx/keyc/openid/steamauth"
-	"github.com/mtdx/keyc/steam"
-	"github.com/mtdx/keyc/validator"
-	"github.com/mtdx/keyc/vault"
 )
 
 const testSteamID = "11111111111111111"
@@ -60,19 +48,11 @@ func callEndpoint(t *testing.T, ts *httptest.Server, method, path string, body i
 	return resp, string(respBody)
 }
 
-func assertAuthRequired(t *testing.T, ts *httptest.Server, method string, route string) {
-	t.Parallel()
-	_, body := callEndpoint(t, ts, method, route, nil, "jwt-test")
-	if strings.Compare(strings.TrimSpace(body), `Unauthorized`) != 0 {
-		t.Fatalf("got: %s", body)
-	}
-}
-
 func TestMain(m *testing.M) {
 	dbconn := db.Open()
 	defer dbconn.Close()
 
-	r := StartRouter(dbconn)
+	r := Router(dbconn)
 	ts = httptest.NewServer(r)
 	defer ts.Close()
 
@@ -85,91 +65,38 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func AccountSummaryCheck(t *testing.T, bitcoinBalance float64, tradeLinik string) {
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/account", nil, jwt)
-	var inforesp = &account.InfoResponse{}
-	if err := json.Unmarshal([]byte(body), &inforesp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
+// Auth tests
 
-	if err := validator.Validate(inforesp); err != nil {
-		t.Fatalf("got: %s", err.Error())
-	}
+func TestAccountSummaryAuth(t *testing.T) {
+	t.Parallel()
+	assertAuth(t, ts, "GET", "/api/v1/account")
+}
 
-	if inforesp.BitcoinBalance != bitcoinBalance || inforesp.TradeLinkURL.String != tradeLinik {
-		t.Fatalf("got: %s", body)
-	}
+func TestTradeoffersAuth(t *testing.T) {
+	t.Parallel()
+	assertAuth(t, ts, "GET", "/api/v1/tradeoffers")
 }
-func TestAccountSummaryAuthRequired(t *testing.T) {
-	assertAuthRequired(t, ts, "GET", "/api/v1/account")
+
+func TestWithdrawalsAuth(t *testing.T) {
+	t.Parallel()
+	assertAuth(t, ts, "GET", "/api/v1/withdrawals")
 }
+
+// full tests
 
 func TestAccountSummary(t *testing.T) {
 	t.Parallel()
-
-	AccountSummaryCheck(t, 1, "")
-}
-
-func TestTradeoffersAuthRequired(t *testing.T) {
-	assertAuthRequired(t, ts, "GET", "/api/v1/tradeoffers")
+	accountSummaryCheck(t, 1, "")
 }
 
 func TestTradeoffers(t *testing.T) {
 	t.Parallel()
+	tradeoffersCheck(t)
+}
 
-	tradeofferreq1 := &steam.TradeoffersRequest{
-		SteamID: testSteamID,
-		Status:  labels.ACTIVE,
-		Type:    labels.CSGO_KEY,
-		Amount:  2,
-		AppID:   730,
-	}
-	tradeofferreq2 := &steam.TradeoffersRequest{
-		SteamID: testSteamID,
-		Status:  labels.ACCEPTED,
-		Type:    labels.CSGO_KEY,
-		Amount:  4,
-		AppID:   730,
-	}
-	jsonreq, _ = json.Marshal(tradeofferreq1)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
-	jsonreq, _ = json.Marshal(tradeofferreq2)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
-
-	var successResp common.SuccessResponse
-	if err := json.Unmarshal([]byte(body), &successResp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
-	if successResp.StatusText != "Tradeoffer has been created" {
-		t.Fatalf("got: %s", successResp.StatusText+" | "+successResp.SuccessText)
-	}
-
-	jsonreq, _ = json.Marshal(tradeofferreq2)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers", bytes.NewReader(jsonreq), jwt)
-	var errResp common.ErrResponse
-	if err := json.Unmarshal([]byte(body), &errResp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
-	if errResp.StatusText != "Invalid request" {
-		t.Fatalf("got: %s", errResp.StatusText)
-	}
-
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
-	tradeoffersresp := make([]steam.TradeoffersResponse, 2)
-	if err := json.Unmarshal([]byte(body), &tradeoffersresp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
-
-	for _, tradeoffer := range tradeoffersresp {
-		if err := validator.Validate(tradeoffer); err != nil {
-			t.Fatalf("got: %s", err.Error())
-		}
-	}
-
-	if len(tradeoffersresp) != 2 || tradeoffersresp[0].Status != labels.ACTIVE ||
-		tradeoffersresp[1].Type != labels.CSGO_KEY || tradeoffersresp[0].Amount != 4 {
-		t.Fatalf("got: %s", body)
-	}
+func TestWithdrawals(t *testing.T) {
+	t.Parallel()
+	withdrawalsCheck(t)
 }
 
 // func TestKeysTransactionsAuthRequired(t *testing.T) {
@@ -196,64 +123,6 @@ func TestTradeoffers(t *testing.T) {
 // 		t.Fatalf("got: %s", body)
 // 	}
 // }
-
-func TestWithdrawalsAuthRequired(t *testing.T) {
-	assertAuthRequired(t, ts, "GET", "/api/v1/withdrawals")
-}
-
-func TestWithdrawals(t *testing.T) {
-	t.Parallel()
-
-	bb1 := 0.00041839
-	bb2 := 0.00086091
-	withdrawalreq1 := &vault.WithdrawalsRequest{
-		PaymentAddress: "1Gj4mwxWC8W9yhnrK5fVfYC2oV1jNdpiCS",
-		CryptoTotal:    bb1,
-	}
-	withdrawalreq2 := &vault.WithdrawalsRequest{
-		PaymentAddress: "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
-		CryptoTotal:    bb2,
-	}
-	withdrawalreq3 := &vault.WithdrawalsRequest{
-		PaymentAddress: "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
-		CryptoTotal:    1,
-	}
-	jsonreq, _ = json.Marshal(withdrawalreq1)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
-	jsonreq, _ = json.Marshal(withdrawalreq2)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
-	jsonreq, _ = json.Marshal(withdrawalreq3)
-	_, body = callEndpoint(t, ts, "POST", "/api/v1/withdrawals", bytes.NewReader(jsonreq), jwt)
-
-	var errLowBalance common.ErrResponse
-	if err := json.Unmarshal([]byte(body), &errLowBalance); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
-	if errLowBalance.ErrorText != "Not enough balance" {
-		t.Fatalf("Failed to reject withdrawal, got %s", errLowBalance.StatusText)
-	}
-
-	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
-	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
-	if err := json.Unmarshal([]byte(body), &withdrawalsresp); err != nil {
-		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
-	}
-
-	for _, withdrawal := range withdrawalsresp {
-		if err := validator.Validate(withdrawal); err != nil {
-			t.Fatalf("got: %s", err.Error())
-		}
-	}
-
-	if len(withdrawalsresp) != 2 || withdrawalsresp[0].Status != labels.PENDING ||
-		withdrawalsresp[1].Currency != labels.BTC || withdrawalsresp[0].CryptoTotal != bb2 ||
-		withdrawalsresp[1].CryptoTotal != bb1 {
-		t.Fatalf("got: %s", body)
-	}
-
-	// test balance change
-	AccountSummaryCheck(t, 1-bb1-bb2, "")
-}
 
 func setupTestUserData(dbconn *sql.DB) string {
 	jwt, err = steamauth.SaveUser(dbconn, testSteamID, "PersonaName", "https://avatar.com/img.jpg")

@@ -12,6 +12,6 @@ func main() {
 	db.RunMigrations(dbconn)
 	defer dbconn.Close()
 
-	r := rest.StartRouter(dbconn)
+	r := rest.Router(dbconn)
 	http.ListenAndServe(":8080", r)
 }
