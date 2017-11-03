@@ -30,5 +30,5 @@ type WithdrawalsResponse struct {
 // WithdrawalsRequest ...
 type WithdrawalsRequest struct {
 	PaymentAddress string  `json:"payment_address" validate:"nonzero"`
-	CryptoTotal    float64 `json:"crypto_total" min:"0.00000001"`
+	CryptoTotal    float64 `json:"crypto_total" validate:"min=0.00000001"`
 }

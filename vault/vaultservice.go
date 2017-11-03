@@ -50,7 +50,7 @@ func saveWithdrawal(dbconn *sql.DB, withdrawal *WithdrawalsRequest, userid inter
 		if err != nil || err == sql.ErrNoRows {
 			return err
 		}
-		if balance-withdrawal.CryptoTotal < 0 {
+		if balance-math.Abs(withdrawal.CryptoTotal) < 0 {
 			return errors.New("Not enough balance")
 		}
 		if _, err := tx.Exec(`UPDATE users SET bitcoin_balance = bitcoin_balance - $1 WHERE steam_id = $2`,
