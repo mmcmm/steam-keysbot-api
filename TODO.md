@@ -2,4 +2,7 @@
     - https://github.com/zpao/qrcode.react
     - cs.money like inventory (use free proxies)
     - rate limit public areas in go (middleware)
-    - add btc price update fallback (check for updated_at)
+
+
+    - next 
+        errors, and loose ends (static withdraw data)
