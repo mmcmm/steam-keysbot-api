@@ -34,3 +34,9 @@ const (
 	BTC
 	ETH
 )
+
+const (
+	_ = iota
+	BTC_USD_RATE
+	BASE_CSGOKEY_PRICE
+)

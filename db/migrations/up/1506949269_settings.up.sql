@@ -1,13 +1,10 @@
-CREATE TABLE settings
+CREATE TABLE price_settings
 (
-  id              SERIAL                                        NOT NULL
-    CONSTRAINT settings_pkey
-    PRIMARY KEY,
-  btc_to_usd_rate         NUMERIC(10, 2)                        NOT NULL,
-  buy_csgokey_price       NUMERIC(10, 2)                        NOT NULL,
-  sell_csgokey_price      NUMERIC(10, 2)                        NOT NULL,
-  updated_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+  key        INTEGER                                         NOT NULL
+  CONSTRAINT settings_pkey
+  PRIMARY KEY,
+  value      NUMERIC(10, 2)                                  NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()          NOT NULL
 );
 
-INSERT INTO settings (id, btc_to_usd_rate, buy_csgokey_price, sell_csgokey_price) 
-VALUES (1, 0, 0, 0) ON CONFLICT DO NOTHING;
+INSERT INTO price_settings (key, value) VALUES(1 /* BTC_USD_RATE */, 0) ON CONFLICT DO NOTHING; 

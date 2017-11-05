@@ -1,1 +1,1 @@
-DROP TABLE settings;
+DROP TABLE price_settings;
