@@ -3,9 +3,8 @@ package main
 import (
 	"net/http"
 
-	_ "github.com/mtdx/keyc/internal"
-
 	"github.com/mtdx/keyc/db"
+	_ "github.com/mtdx/keyc/internal"
 	"github.com/mtdx/keyc/rest"
 )
 

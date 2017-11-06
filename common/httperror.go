@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
+	"github.com/mtdx/keyc/internal"
 )
 
 // ErrResponse ...
@@ -24,6 +25,8 @@ func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 
 // ErrInvalidRequest ...
 func ErrInvalidRequest(err error) render.Renderer {
+	internal.SaveErr(internal.E{Func: "400", Message: err.Error()})
+
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 400,
@@ -34,6 +37,8 @@ func ErrInvalidRequest(err error) render.Renderer {
 
 // ErrInternalServer ...
 func ErrInternalServer(err error) render.Renderer {
+	internal.SaveErr(internal.E{Func: "500", Message: err.Error()})
+
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 500,
@@ -44,6 +49,8 @@ func ErrInternalServer(err error) render.Renderer {
 
 // ErrRender ...
 func ErrRender(err error) render.Renderer {
+	internal.SaveErr(internal.E{Func: "422", Message: err.Error()})
+
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 422,
