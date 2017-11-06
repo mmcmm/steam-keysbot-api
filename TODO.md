@@ -5,4 +5,4 @@
 
 
     - next 
-        errors, and loose ends (static withdraw data)
+       loose ends (static withdraw data) put trade offers get key base price
