@@ -8,6 +8,5 @@ CREATE TABLE price_settings
 );
 
 INSERT INTO price_settings (key, value) VALUES(1 /* BTC_USD_RATE */, 0) ON CONFLICT DO NOTHING; 
-INSERT INTO price_settings (key, value) VALUES(2 /* BASE_CSGOKEY_PRICE */, 0) ON CONFLICT DO NOTHING; 
-INSERT INTO price_settings (key, value) VALUES(3 /* BUY_CSGOKEY_PRICE */, 0) ON CONFLICT DO NOTHING; 
-INSERT INTO price_settings (key, value) VALUES(4 /* SELL_CSGOKEY_PRICE */, 0) ON CONFLICT DO NOTHING; 
+INSERT INTO price_settings (key, value) VALUES(2 /* BUY_CSGOKEY_PRICE */, 0) ON CONFLICT DO NOTHING; 
+INSERT INTO price_settings (key, value) VALUES(3 /* SELL_CSGOKEY_PRICE */, 0) ON CONFLICT DO NOTHING; 
