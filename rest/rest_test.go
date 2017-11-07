@@ -9,8 +9,10 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/mtdx/keyc/db"
+	"github.com/mtdx/keyc/internal"
 	"github.com/mtdx/keyc/openid/steamauth"
 )
 
@@ -56,6 +58,8 @@ func TestMain(m *testing.M) {
 	ts = httptest.NewServer(r)
 	defer ts.Close()
 
+	internal.InitLiveBtc()
+
 	// setup test user
 	cleanTestUserData(dbconn)
 	jwt = setupTestUserData(dbconn)
@@ -96,6 +100,7 @@ func TestTradeoffers(t *testing.T) {
 
 func TestWithdrawals(t *testing.T) {
 	t.Parallel()
+	time.Sleep(2 * time.Second)
 	withdrawalsCheck(t)
 }
 

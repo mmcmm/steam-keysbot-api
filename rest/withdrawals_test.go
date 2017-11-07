@@ -38,7 +38,7 @@ func withdrawalsCheck(t *testing.T) {
 	if err := json.Unmarshal([]byte(body), &errLowBalance); err != nil {
 		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
 	}
-	assert.Equal(t, "Not enough balance", errLowBalance.ErrorText, body)
+	assert.Equal(t, "Invalid request", errLowBalance.StatusText, body)
 
 	_, body = callEndpoint(t, ts, "GET", "/api/v1/withdrawals", nil, jwt)
 	withdrawalsresp := make([]vault.WithdrawalsResponse, 2)
@@ -52,11 +52,12 @@ func withdrawalsCheck(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 2, len(withdrawalsresp), body)
-	assert.Equal(t, labels.PENDING, int(withdrawalsresp[0].Status), body)
-	assert.Equal(t, labels.BTC, int(withdrawalsresp[1].Currency), body)
-	assert.Equal(t, bb2, float64(withdrawalsresp[0].CryptoTotal), body)
-	assert.Equal(t, bb1, float64(withdrawalsresp[1].CryptoTotal), body)
+	if assert.Equal(t, 2, len(withdrawalsresp), body) {
+		assert.Equal(t, labels.PENDING, int(withdrawalsresp[0].Status), body)
+		assert.Equal(t, labels.BTC, int(withdrawalsresp[1].Currency), body)
+		assert.Equal(t, bb2, float64(withdrawalsresp[0].CryptoTotal), body)
+		assert.Equal(t, bb1, float64(withdrawalsresp[1].CryptoTotal), body)
+	}
 
 	// test balance change
 	accountSummaryCheck(t, 1-bb1-bb2, "")

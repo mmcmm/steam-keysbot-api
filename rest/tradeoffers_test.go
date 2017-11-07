@@ -59,8 +59,9 @@ func tradeoffersCheck(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 2, len(tradeoffersresp), body)
-	assert.Equal(t, labels.ACTIVE, int(tradeoffersresp[0].Status), body)
-	assert.Equal(t, labels.CSGO_KEY, int(tradeoffersresp[1].Type), body)
-	assert.Equal(t, 4, int(tradeoffersresp[0].Amount), body)
+	if assert.Equal(t, 2, len(tradeoffersresp), body) {
+		assert.Equal(t, labels.ACTIVE, int(tradeoffersresp[0].Status), body)
+		assert.Equal(t, labels.CSGO_KEY, int(tradeoffersresp[1].Type), body)
+		assert.Equal(t, 4, int(tradeoffersresp[0].Amount), body)
+	}
 }

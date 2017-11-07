@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"os"
 	"strconv"
 
 	"github.com/mtdx/keyc/db"
@@ -12,13 +11,15 @@ import (
 
 var dbconn = db.Open()
 
-func init() {
+// InitLiveBtc ...
+func InitLiveBtc() error {
 	err := liveBtcPrice()
 	if err != nil { // if we still can't connect
-		SaveErr(E{"internal.init.liveBtcPrice", err.Error()})
+		SaveErr(E{"internal.InitLiveBtc", err.Error()})
 		resetBtcPrice()
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
 // LiveBtcPrice ...

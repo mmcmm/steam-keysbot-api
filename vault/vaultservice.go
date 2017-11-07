@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"math"
+	"time"
 
 	"github.com/mtdx/keyc/labels"
 
@@ -57,14 +58,23 @@ func saveWithdrawal(dbconn *sql.DB, withdrawal *WithdrawalsRequest, userid inter
 			math.Abs(withdrawal.CryptoTotal), userid); err != nil {
 			return err
 		}
-		// TODO: get rate and make sure is updated recently otherwise reject and register error
+		var btcrate float64
+		var updatedAt time.Time
+		err = tx.QueryRow(`SELECT value, updated_at FROM price_settings WHERE key = $1`,
+			labels.BTC_USD_RATE).Scan(&btcrate, &updatedAt)
+		if err != nil || err == sql.ErrNoRows {
+			return err
+		}
+		if btcrate == 0 || updatedAt.Unix() < time.Now().Unix()-2 {
+			return errors.New("Invalid BTC rate or not recently updated")
+		}
 		if _, err := tx.Exec(`INSERT INTO withdrawals (user_steam_id, payment_address, usd_rate, currency, 
 			usd_total, crypto_total) VALUES ($1, $2, $3, $4, $5, $6)`,
 			userid,
 			withdrawal.PaymentAddress,
-			5732.09,
+			btcrate,
 			labels.BTC,
-			30.44,
+			withdrawal.CryptoTotal*btcrate,
 			withdrawal.CryptoTotal,
 		); err != nil {
 			return err

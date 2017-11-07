@@ -33,7 +33,7 @@ func WithdrawalRequestHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
 	if err := saveWithdrawal(dbconn, withdrawal, claims["id"]); err != nil {
-		render.Render(w, r, common.ErrInternalServer(err))
+		render.Render(w, r, common.ErrInvalidRequest(err))
 		return
 	}
 	render.Render(w, r, common.SuccessCreatedResponse("Withdrawal has been created"))

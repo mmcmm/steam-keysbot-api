@@ -13,8 +13,8 @@ import (
 func TestBtcPriceUpdated(t *testing.T) {
 	t.Parallel()
 
-	liveBtcPrice()
-	time.Sleep(1 * time.Second)
+	InitLiveBtc()
+	time.Sleep(2 * time.Second)
 
 	var btcusdrate float64
 	var updatedAt time.Time
@@ -26,5 +26,5 @@ func TestBtcPriceUpdated(t *testing.T) {
 		t.Fatalf("Failed to get price and updated, error: %s", err.Error())
 	}
 	assert.NotEqual(t, btcusdrate, 0)
-	assert.True(t, time.Now().Unix()-2 <= updatedAt.Unix())
+	assert.True(t, time.Now().Unix()-2 < updatedAt.Unix())
 }
