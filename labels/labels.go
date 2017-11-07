@@ -38,7 +38,6 @@ const (
 const (
 	_ = iota
 	BTC_USD_RATE
-	BASE_CSGOKEY_PRICE
 	BUY_CSGOKEY_PRICE
 	SELL_CSGOKEY_PRICE
 )
