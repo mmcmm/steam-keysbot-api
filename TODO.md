@@ -4,5 +4,3 @@
     - rate limit public areas in go (middleware)
 
 
-    - next 
-       loose ends (static withdraw data) put trade offers get key base price

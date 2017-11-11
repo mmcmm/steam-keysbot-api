@@ -1,6 +1,6 @@
 CREATE TABLE tradeoffers
 (
-  id                SERIAL                                 NOT NULL
+  tradeoffer_id     BIGINT                                 NOT NULL
     CONSTRAINT tradeoffers_pkey
     PRIMARY KEY,
   user_steam_id     BIGINT                                 NOT NULL
