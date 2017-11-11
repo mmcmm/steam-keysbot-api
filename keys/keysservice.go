@@ -53,11 +53,8 @@ func createTransaction(dbconn *sql.DB, transaction *TransactionsRequest) error {
 	if err != nil {
 		return err
 	}
-	if time.Now().Unix()-2 > updatedAt.Unix() {
-		return errors.New("Invalid BTC updated time")
-	}
-	if unitprice <= 0 {
-		return errors.New("Invalid case key price")
+	if btcrate == 0 || updatedAt.Unix() < time.Now().Unix()-2 || unitprice <= 0 {
+		return errors.New("Invalid BTC rate or case key price")
 	}
 	_, err = dbconn.Exec(`INSERT INTO key_transactions (user_steam_id, tradeoffer_id, type, transaction_type, 
 		amount, unit_price, payment_address, usd_rate, currency, usd_total, crypto_total, app_id) 
