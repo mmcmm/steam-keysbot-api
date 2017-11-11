@@ -8,7 +8,7 @@ func (tr *TransactionsResponse) Render(w http.ResponseWriter, r *http.Request) e
 }
 
 // Bind post-processing after a decoding.
-func (tr *TransactionsResponse) Bind(r *http.Request) error {
+func (tr *TransactionsRequest) Bind(r *http.Request) error {
 	return nil
 }
 
@@ -24,4 +24,16 @@ type TransactionsResponse struct {
 	USDTotal       float64 `json:"usd_total" validate:"nonzero"`
 	CryptoTotal    float64 `json:"crypto_total" validate:"nonzero"`
 	CreatedAt      string  `json:"created_at" validate:"nonzero"`
+}
+
+// TransactionsRequest ...
+type TransactionsRequest struct {
+	UserSteamID     string `json:"user_steam_id" validate:"nonzero"`
+	TradeofferID    string `json:"tradeoffer_id" validate:"nonzero"`
+	Type            uint8  `json:"type" validate:"nonzero"`
+	TransactionType uint8  `json:"transaction_type" validate:"nonzero"`
+	Amount          uint32 `json:"amount" validate:"min=1"`
+	PaymentAddress  string `json:"payment_address" validate:"nonzero"`
+	Currency        uint8  `json:"currency" validate:"nonzero"`
+	AppID           uint32 `json:"app_id" validate:"nonzero"`
 }

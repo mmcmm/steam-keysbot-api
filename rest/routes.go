@@ -31,6 +31,7 @@ func routes() {
 
 			r.Get("/account", account.InfoHandler)
 			r.Get("/tradeoffers", steam.TradeoffersHandler)
+
 			r.Get("/keys-transactions", keys.TransactionsHandler)
 
 			r.Get("/withdrawals", vault.WithdrawalsHandler)
@@ -38,6 +39,7 @@ func routes() {
 		})
 		// Unprotected routes
 		r.Post("/tradeoffers", steam.TradeoffersCreateHandler)
+		r.Post("/keys-transactions", keys.TransactionCreateHandler)
 	})
 }
 

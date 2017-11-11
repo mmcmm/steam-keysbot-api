@@ -23,7 +23,7 @@ func TradeoffersHandler(w http.ResponseWriter, r *http.Request) {
 func TradeoffersCreateHandler(w http.ResponseWriter, r *http.Request) {
 	queryValues := r.URL.Query()
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
-	if queryValues.Get("key") != config.SteamBotsAPIKey() || !isOurSteamBot(dbconn, r.RemoteAddr) {
+	if queryValues.Get("key") != config.SteamBotsAPIKey() || !IsOurSteamBot(dbconn, r.RemoteAddr) {
 		render.Render(w, r, common.ErrInvalidRequest(errors.New("Unauthorized")))
 		return
 	}

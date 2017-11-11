@@ -15,18 +15,20 @@ import (
 
 func tradeoffersCheck(t *testing.T) {
 	tradeofferreq1 := &steam.TradeoffersRequest{
-		SteamID: testSteamID,
-		Status:  labels.ACTIVE,
-		Type:    labels.CSGO_KEY,
-		Amount:  2,
-		AppID:   730,
+		TradeofferID: testTradeOfferID1,
+		SteamID:      testSteamID,
+		Status:       labels.ACTIVE,
+		Type:         labels.CSGO_KEY,
+		Amount:       2,
+		AppID:        labels.CSGO_APP_ID,
 	}
 	tradeofferreq2 := &steam.TradeoffersRequest{
-		SteamID: testSteamID,
-		Status:  labels.ACCEPTED,
-		Type:    labels.CSGO_KEY,
-		Amount:  4,
-		AppID:   730,
+		TradeofferID: testTradeOfferID2,
+		SteamID:      testSteamID,
+		Status:       labels.ACCEPTED,
+		Type:         labels.CSGO_KEY,
+		Amount:       4,
+		AppID:        labels.CSGO_APP_ID,
 	}
 	jsonreq, _ = json.Marshal(tradeofferreq1)
 	_, body = callEndpoint(t, ts, "POST", "/api/v1/tradeoffers?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)

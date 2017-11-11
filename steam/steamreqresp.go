@@ -26,6 +26,7 @@ type TradeoffersResponse struct {
 
 // TradeoffersRequest ...
 type TradeoffersRequest struct {
+	TradeofferID   string `json:"tradeoffer_id" validate:"nonzero"`
 	SteamID        string `json:"steam_id" validate:"nonzero"`
 	Status         uint8  `json:"status" validate:"nonzero"`
 	FailureDetails string `json:"failure_details"`

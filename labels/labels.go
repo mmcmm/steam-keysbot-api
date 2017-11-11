@@ -7,12 +7,6 @@ const (
 )
 
 const (
-	_ = iota
-	BUY
-	SELL
-)
-
-const (
 	CSGO_APP_ID = 730
 )
 
@@ -32,7 +26,7 @@ const (
 const (
 	_ = iota
 	BTC
-	ETH
+	BCH
 )
 
 const (

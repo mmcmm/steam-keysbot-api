@@ -10,7 +10,7 @@ import (
 	"github.com/mtdx/keyc/validator"
 )
 
-// WithdrawalsHandler rest route handler
+// WithdrawalsHandler rest route handler GET /withdrawals
 func WithdrawalsHandler(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)

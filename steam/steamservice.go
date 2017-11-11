@@ -10,7 +10,7 @@ import (
 
 func findAllTradeoffers(dbconn *sql.DB, id interface{}) ([]render.Renderer, error) {
 	rows, err := dbconn.Query(`SELECT type, status, failure_details, amount, created_at 
-		FROM tradeoffers WHERE user_steam_id = $1 ORDER BY id DESC`, id)
+		FROM tradeoffers WHERE user_steam_id = $1 ORDER BY tradeoffer_id DESC`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -37,8 +37,9 @@ func findAllTradeoffers(dbconn *sql.DB, id interface{}) ([]render.Renderer, erro
 }
 
 func saveTradeoffer(dbconn *sql.DB, tradeoffer *TradeoffersRequest) error {
-	_, err := dbconn.Exec(`INSERT INTO tradeoffers (user_steam_id, type, status, amount, app_id)
-	VALUES ($1, $2, $3, $4, $5)`,
+	_, err := dbconn.Exec(`INSERT INTO tradeoffers (tradeoffer_id, user_steam_id, type, status, amount, app_id)
+	VALUES ($1, $2, $3, $4, $5, $6)`,
+		tradeoffer.TradeofferID,
 		tradeoffer.SteamID,
 		tradeoffer.Type,
 		labels.ACTIVE,
@@ -49,7 +50,8 @@ func saveTradeoffer(dbconn *sql.DB, tradeoffer *TradeoffersRequest) error {
 	return err
 }
 
-func isOurSteamBot(dbconn *sql.DB, ip string) bool {
+// IsOurSteamBot ...
+func IsOurSteamBot(dbconn *sql.DB, ip string) bool {
 	var dbip string
 	ip = ip[0:strings.Index(ip, ":")]
 	err := dbconn.QueryRow("SELECT ip_address FROM steam_bots WHERE ip_address = $1", ip).Scan(&dbip)
