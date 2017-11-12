@@ -17,6 +17,7 @@ type TransactionsResponse struct {
 	Status         uint8   `json:"status" validate:"nonzero"`
 	Type           uint8   `json:"type" validate:"nonzero"`
 	Amount         uint32  `json:"amount" validate:"min=1"`
+	Item           string  `json:"item" validate:"nonzero"`
 	UnitPrice      float64 `json:"unit_price" validate:"nonzero"`
 	PaymentAddress string  `json:"payment_address" validate:"nonzero"`
 	USDRate        float64 `json:"usd_rate" validate:"nonzero"`
@@ -33,6 +34,7 @@ type TransactionsRequest struct {
 	Type            uint8  `json:"type" validate:"nonzero"`
 	TransactionType uint8  `json:"transaction_type" validate:"nonzero"`
 	Amount          uint32 `json:"amount" validate:"min=1"`
+	Item            string `json:"item" validate:"nonzero"`
 	PaymentAddress  string `json:"payment_address" validate:"nonzero"`
 	Currency        uint8  `json:"currency" validate:"nonzero"`
 	AppID           uint32 `json:"app_id" validate:"nonzero"`

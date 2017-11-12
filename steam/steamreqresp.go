@@ -31,12 +31,13 @@ type TradeoffersResponse struct {
 
 // TradeoffersRequest ...
 type TradeoffersRequest struct {
-	TradeofferID   string `json:"tradeoffer_id" validate:"nonzero"`
-	SteamID        string `json:"steam_id" validate:"nonzero"`
-	FailureDetails string `json:"failure_details"`
-	Type           uint8  `json:"type" validate:"nonzero"`
-	Amount         uint32 `json:"amount" validate:"min=1"`
-	AppID          uint   `json:"app_id" validate:"nonzero"`
+	TradeofferID    string `json:"tradeoffer_id" validate:"nonzero"`
+	SteamID         string `json:"steam_id" validate:"nonzero"`
+	FailureDetails  string `json:"failure_details"`
+	Type            uint8  `json:"type" validate:"nonzero"`
+	MerchantSteamID string `json:"merchant_steam_id" validate:"nonzero"`
+	Amount          uint32 `json:"amount" validate:"min=1"`
+	AppID           uint   `json:"app_id" validate:"nonzero"`
 }
 
 // TradeoffersUpdateRequest ...

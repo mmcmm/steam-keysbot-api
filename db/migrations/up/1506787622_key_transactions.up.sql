@@ -16,6 +16,7 @@ CREATE TABLE key_transactions
   type             INTEGER                                NOT NULL,
   transaction_type INTEGER                                NOT NULL,
   amount           INTEGER                                NOT NULL,
+  item             VARCHAR(255)                           NOT NULL,
   unit_price       NUMERIC(10, 2)                         NOT NULL,
   payment_address  VARCHAR(60),
   usd_rate         NUMERIC(10, 2)                         NOT NULL,

@@ -36,11 +36,12 @@ func findAllTradeoffers(dbconn *sql.DB, id interface{}) ([]render.Renderer, erro
 }
 
 func saveTradeoffer(dbconn *sql.DB, tradeoffer *TradeoffersRequest) error {
-	_, err := dbconn.Exec(`INSERT INTO tradeoffers (tradeoffer_id, user_steam_id, type, amount, app_id)
-	VALUES ($1, $2, $3, $4, $5)`,
+	_, err := dbconn.Exec(`INSERT INTO tradeoffers (tradeoffer_id, user_steam_id, type, merchant_steam_id, amount, app_id)
+	VALUES ($1, $2, $3, $4, $5, $6)`,
 		tradeoffer.TradeofferID,
 		tradeoffer.SteamID,
 		tradeoffer.Type,
+		tradeoffer.MerchantSteamID,
 		tradeoffer.Amount,
 		tradeoffer.AppID,
 	)

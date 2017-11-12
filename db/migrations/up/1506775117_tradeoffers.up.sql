@@ -8,11 +8,8 @@ CREATE TABLE tradeoffers
     REFERENCES users,
   type              INTEGER                                NOT NULL,
   status            INTEGER DEFAULT 1 /* ACTIVE */         NOT NULL,
-  merchant_steam_id BIGINT,
-  steam_offer_id    BIGINT,
+  merchant_steam_id BIGINT                                 NOT NULL,   
   failure_details   VARCHAR(255),
-  user_items        VARCHAR(255),
-  bot_items         VARCHAR(255),
   amount            INTEGER                                NOT NULL,
   app_id            INTEGER                                NOT NULL,
   created_at        TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
