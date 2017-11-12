@@ -17,7 +17,6 @@ func tradeoffersCheck(t *testing.T) {
 	tradeofferreq1 := &steam.TradeoffersRequest{
 		TradeofferID: testTradeOfferID1,
 		SteamID:      testSteamID,
-		Status:       labels.ACTIVE,
 		Type:         labels.CSGO_KEY,
 		Amount:       2,
 		AppID:        labels.CSGO_APP_ID,
@@ -25,7 +24,6 @@ func tradeoffersCheck(t *testing.T) {
 	tradeofferreq2 := &steam.TradeoffersRequest{
 		TradeofferID: testTradeOfferID2,
 		SteamID:      testSteamID,
-		Status:       labels.ACCEPTED,
 		Type:         labels.CSGO_KEY,
 		Amount:       4,
 		AppID:        labels.CSGO_APP_ID,
@@ -65,5 +63,43 @@ func tradeoffersCheck(t *testing.T) {
 		assert.Equal(t, labels.ACTIVE, int(tradeoffersresp[0].Status), body)
 		assert.Equal(t, labels.CSGO_KEY, int(tradeoffersresp[1].Type), body)
 		assert.Equal(t, 4, int(tradeoffersresp[0].Amount), body)
+	}
+
+	// validate update next
+	tradeofferupdatereq1 := &steam.TradeoffersUpdateRequest{
+		Status:         labels.ACCEPTED,
+		FailureDetails: "",
+	}
+	tradeofferupdatereq2 := &steam.TradeoffersUpdateRequest{
+		Status:         labels.DECLINED,
+		FailureDetails: "Declined",
+	}
+	jsonreq, _ = json.Marshal(tradeofferupdatereq1)
+	_, body = callEndpoint(t, ts, "PUT", "/api/v1/tradeoffers/"+testTradeOfferID1+"?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+	jsonreq, _ = json.Marshal(tradeofferupdatereq2)
+	_, body = callEndpoint(t, ts, "PUT", "/api/v1/tradeoffers/"+testTradeOfferID2+"?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+
+	var successUpdateResp common.SuccessResponse
+	if err := json.Unmarshal([]byte(body), &successUpdateResp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	assert.Equal(t, successUpdateResp.StatusText, "Tradeoffer has been updated", successUpdateResp.StatusText+", "+successUpdateResp.SuccessText)
+
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/tradeoffers", nil, jwt)
+	tradeoffersresp = make([]steam.TradeoffersResponse, 2)
+	if err := json.Unmarshal([]byte(body), &tradeoffersresp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+
+	for _, tradeoffer := range tradeoffersresp {
+		if err := validator.Validate(tradeoffer); err != nil {
+			t.Fatalf("Error: %s", err.Error())
+		}
+	}
+
+	if assert.Equal(t, 2, len(tradeoffersresp), body) {
+		assert.Equal(t, labels.ACCEPTED, int(tradeoffersresp[1].Status), body)
+		assert.Equal(t, labels.DECLINED, int(tradeoffersresp[0].Status), body)
+		assert.Equal(t, "Declined", tradeoffersresp[0].FailureDetails.String, body)
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/go-chi/render"
-	"github.com/mtdx/keyc/labels"
 )
 
 func findAllTradeoffers(dbconn *sql.DB, id interface{}) ([]render.Renderer, error) {
@@ -37,14 +36,23 @@ func findAllTradeoffers(dbconn *sql.DB, id interface{}) ([]render.Renderer, erro
 }
 
 func saveTradeoffer(dbconn *sql.DB, tradeoffer *TradeoffersRequest) error {
-	_, err := dbconn.Exec(`INSERT INTO tradeoffers (tradeoffer_id, user_steam_id, type, status, amount, app_id)
-	VALUES ($1, $2, $3, $4, $5, $6)`,
+	_, err := dbconn.Exec(`INSERT INTO tradeoffers (tradeoffer_id, user_steam_id, type, amount, app_id)
+	VALUES ($1, $2, $3, $4, $5)`,
 		tradeoffer.TradeofferID,
 		tradeoffer.SteamID,
 		tradeoffer.Type,
-		labels.ACTIVE,
 		tradeoffer.Amount,
 		tradeoffer.AppID,
+	)
+
+	return err
+}
+
+func updateStatus(dbconn *sql.DB, tradeoffer *TradeoffersUpdateRequest, tradeofferID string) error {
+	_, err := dbconn.Exec(`UPDATE tradeoffers SET status = $2, failure_details = $3 WHERE tradeoffer_id = $1`,
+		tradeofferID,
+		tradeoffer.Status,
+		tradeoffer.FailureDetails,
 	)
 
 	return err

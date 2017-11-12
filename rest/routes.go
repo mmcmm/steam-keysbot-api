@@ -39,6 +39,8 @@ func routes() {
 		})
 		// Unprotected routes
 		r.Post("/tradeoffers", steam.TradeoffersCreateHandler)
+		r.Put("/tradeoffers/{tradeofferID:[1-9]+}", steam.TradeoffersUpdateHandler)
+
 		r.Post("/keys-transactions", keys.TransactionCreateHandler)
 	})
 }
