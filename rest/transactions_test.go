@@ -17,7 +17,7 @@ func transactionsCheck(t *testing.T) {
 	transaction1 := &keys.TransactionsRequest{
 		UserSteamID:     testSteamID,
 		TradeofferID:    testTradeOfferID1,
-		Type:            labels.CSGO_KEY,
+		Type:            labels.SELLTOUS,
 		TransactionType: labels.BUY_CSGOKEY_PRICE,
 		Amount:          4,
 		Item:            "Shadow Case Key",
@@ -28,7 +28,7 @@ func transactionsCheck(t *testing.T) {
 	transaction2 := &keys.TransactionsRequest{
 		UserSteamID:     testSteamID,
 		TradeofferID:    testTradeOfferID2,
-		Type:            labels.CSGO_KEY,
+		Type:            labels.SELLTOUS,
 		TransactionType: labels.SELL_CSGOKEY_PRICE,
 		Amount:          8,
 		Item:            "Operation Phoenix Case Key",
@@ -70,7 +70,7 @@ func transactionsCheck(t *testing.T) {
 
 	if assert.Equal(t, 2, len(transactionresp), body) {
 		assert.Equal(t, labels.PENDING, int(transactionresp[0].Status), body)
-		assert.Equal(t, labels.CSGO_KEY, int(transactionresp[1].Type), body)
+		assert.Equal(t, labels.SELLTOUS, int(transactionresp[1].Type), body)
 		assert.Equal(t, 8, int(transactionresp[0].Amount), body)
 	}
 }

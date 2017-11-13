@@ -1,15 +1,18 @@
 package labels
 
+// type
 const (
-	_ = iota
-	CSGO_KEY
-	CSGO_CASE
+	_         = iota
+	SELLTOUS  // sell to us
+	BUYFROMUS // buy from us
 )
 
+// games
 const (
 	CSGO_APP_ID = 730
 )
 
+// status
 const (
 	_ = iota
 	ACTIVE
@@ -21,14 +24,20 @@ const (
 	COMPLETED
 	UNPAID
 	PENDING
+	INVALIDITEMS
+	CREATEDNEEDSCONFIRMATION
+	CANCELEDBYSECONDFACTOR
+	INESCROW
 )
 
+// currency
 const (
 	_ = iota
 	BTC
 	BCH
 )
 
+// settings
 const (
 	_ = iota
 	BTC_USD_RATE

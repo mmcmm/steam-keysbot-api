@@ -17,7 +17,7 @@ func tradeoffersCheck(t *testing.T) {
 	tradeofferreq1 := &steam.TradeoffersRequest{
 		TradeofferID:    testTradeOfferID1,
 		SteamID:         testSteamID,
-		Type:            labels.CSGO_KEY,
+		Type:            labels.BUYFROMUS,
 		MerchantSteamID: testSteamID,
 		Amount:          2,
 		AppID:           labels.CSGO_APP_ID,
@@ -25,7 +25,7 @@ func tradeoffersCheck(t *testing.T) {
 	tradeofferreq2 := &steam.TradeoffersRequest{
 		TradeofferID:    testTradeOfferID2,
 		SteamID:         testSteamID,
-		Type:            labels.CSGO_KEY,
+		Type:            labels.BUYFROMUS,
 		MerchantSteamID: testSteamID,
 		Amount:          4,
 		AppID:           labels.CSGO_APP_ID,
@@ -63,7 +63,7 @@ func tradeoffersCheck(t *testing.T) {
 
 	if assert.Equal(t, 2, len(tradeoffersresp), body) {
 		assert.Equal(t, labels.ACTIVE, int(tradeoffersresp[0].Status), body)
-		assert.Equal(t, labels.CSGO_KEY, int(tradeoffersresp[1].Type), body)
+		assert.Equal(t, labels.BUYFROMUS, int(tradeoffersresp[1].Type), body)
 		assert.Equal(t, 4, int(tradeoffersresp[0].Amount), body)
 	}
 
