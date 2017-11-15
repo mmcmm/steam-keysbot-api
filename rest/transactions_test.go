@@ -17,10 +17,10 @@ func transactionsCheck(t *testing.T) {
 	transaction1 := &keys.TransactionsRequest{
 		UserSteamID:     testSteamID,
 		TradeofferID:    testTradeOfferID1,
+		BotSteamID:      testBoSteamID,
 		Type:            labels.SELLTOUS,
 		TransactionType: labels.BUY_CSGOKEY_PRICE,
 		Amount:          4,
-		Item:            "Shadow Case Key",
 		PaymentAddress:  "1ombvzJzcYRvNuTyTXe6pzVpcJmWVG4Ma",
 		Currency:        labels.BTC,
 		AppID:           labels.CSGO_APP_ID,
@@ -28,10 +28,10 @@ func transactionsCheck(t *testing.T) {
 	transaction2 := &keys.TransactionsRequest{
 		UserSteamID:     testSteamID,
 		TradeofferID:    testTradeOfferID2,
+		BotSteamID:      testBoSteamID,
 		Type:            labels.SELLTOUS,
 		TransactionType: labels.SELL_CSGOKEY_PRICE,
 		Amount:          8,
-		Item:            "Operation Phoenix Case Key",
 		PaymentAddress:  "1PUFW7bfU7if63UcLyUN8WsoZkpBuUVtUv",
 		Currency:        labels.BTC,
 		AppID:           labels.CSGO_APP_ID,

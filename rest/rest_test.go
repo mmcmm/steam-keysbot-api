@@ -19,6 +19,7 @@ import (
 const testSteamID = "11111111111111111"
 const testTradeOfferID1 = "22222222222222222"
 const testTradeOfferID2 = "33333333333333333"
+const testBoSteamID = "44444444444444444"
 
 var ts *httptest.Server
 var body, jwt string
@@ -77,11 +78,6 @@ func TestAccountSummaryAuth(t *testing.T) {
 	assertAuth(t, ts, "GET", "/api/v1/account")
 }
 
-func TestTradeoffersAuth(t *testing.T) {
-	t.Parallel()
-	assertAuth(t, ts, "GET", "/api/v1/tradeoffers")
-}
-
 func TestWithdrawalsAuth(t *testing.T) {
 	t.Parallel()
 	assertAuth(t, ts, "GET", "/api/v1/withdrawals")
@@ -96,11 +92,6 @@ func TestTransactionsAuth(t *testing.T) {
 func TestAccountSummary(t *testing.T) {
 	t.Parallel()
 	accountSummaryCheck(t, 1, "")
-}
-
-func TestTradeoffers(t *testing.T) {
-	t.Parallel()
-	tradeoffersCheck(t)
 }
 
 func TestWithdrawals(t *testing.T) {
@@ -122,7 +113,7 @@ func setupTestUserData(dbconn *sql.DB) string {
 		os.Exit(1)
 	}
 
-	_, err = dbconn.Exec(`INSERT INTO steam_bots (steam_id, ip_address, display_name) VALUES ($1, $2, $3)`, testSteamID, "127.0.0.1", "testuser")
+	_, err = dbconn.Exec(`INSERT INTO steam_bots (steam_id, ip_address, display_name) VALUES ($1, $2, $3)`, testBoSteamID, "127.0.0.1", "testuser")
 	_, err = dbconn.Exec(`UPDATE users SET bitcoin_balance = 1 WHERE steam_id = $1`, testSteamID)
 
 	if err != nil {

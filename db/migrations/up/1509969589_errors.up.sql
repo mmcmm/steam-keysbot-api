@@ -2,7 +2,7 @@ CREATE TABLE errors (
     id              SERIAL                                 NOT NULL
     CONSTRAINT errors_pkey
     PRIMARY KEY,
-    func            VARCHAR(255)                           NOT NULL,
+    source          VARCHAR(255)                           NOT NULL,
     message         VARCHAR(255)                           NOT NULL,
     created_at      TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );

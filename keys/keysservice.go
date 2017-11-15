@@ -11,7 +11,7 @@ import (
 )
 
 func findAllTransactions(dbconn *sql.DB, id interface{}) ([]render.Renderer, error) {
-	rows, err := dbconn.Query(`SELECT status, type, amount, item, unit_price, payment_address, usd_rate, 
+	rows, err := dbconn.Query(`SELECT status, type, amount, unit_price, payment_address, usd_rate, 
 		currency, usd_total, crypto_total, created_at FROM key_transactions WHERE user_steam_id = $1 ORDER BY id DESC`, id)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,6 @@ func findAllTransactions(dbconn *sql.DB, id interface{}) ([]render.Renderer, err
 			&resp.Status,
 			&resp.Type,
 			&resp.Amount,
-			&resp.Item,
 			&resp.UnitPrice,
 			&resp.PaymentAddress,
 			&resp.USDRate,
@@ -57,15 +56,15 @@ func createTransaction(dbconn *sql.DB, transaction *TransactionsRequest) error {
 	if btcrate == 0 || updatedAt.Unix() < time.Now().Unix()-2 || unitprice <= 0 {
 		return errors.New("Invalid BTC rate or case key price")
 	}
-	_, err = dbconn.Exec(`INSERT INTO key_transactions (user_steam_id, tradeoffer_id, type, transaction_type, 
-		amount, item, unit_price, payment_address, usd_rate, currency, usd_total, crypto_total, app_id) 
+	_, err = dbconn.Exec(`INSERT INTO key_transactions (user_steam_id, tradeoffer_id, bot_steam_id, type, 
+		transaction_type, amount, unit_price, payment_address, usd_rate, currency, usd_total, crypto_total, app_id) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
 		transaction.UserSteamID,
 		transaction.TradeofferID,
+		transaction.BotSteamID,
 		transaction.Type,
 		transaction.TransactionType,
 		transaction.Amount,
-		transaction.Item,
 		unitprice,
 		transaction.PaymentAddress,
 		btcrate,
