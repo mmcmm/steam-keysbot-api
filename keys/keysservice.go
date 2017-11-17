@@ -76,3 +76,12 @@ func createTransaction(dbconn *sql.DB, transaction *TransactionsRequest) error {
 
 	return err
 }
+
+func updateStatus(dbconn *sql.DB, transaction *TransactionsUpdateRequest, tradeofferID string) error {
+	_, err := dbconn.Exec(`UPDATE key_transactions SET status = $2 WHERE tradeoffer_id = $1`,
+		tradeofferID,
+		transaction.Status,
+	)
+
+	return err
+}

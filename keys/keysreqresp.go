@@ -12,6 +12,11 @@ func (tr *TransactionsRequest) Bind(r *http.Request) error {
 	return nil
 }
 
+// Bind post-processing after a decoding.
+func (tr *TransactionsUpdateRequest) Bind(r *http.Request) error {
+	return nil
+}
+
 // TransactionsResponse ...
 type TransactionsResponse struct {
 	Status         uint8   `json:"status" validate:"nonzero"`
@@ -37,4 +42,10 @@ type TransactionsRequest struct {
 	PaymentAddress  string `json:"payment_address" validate:"nonzero"`
 	Currency        uint8  `json:"currency" validate:"nonzero"`
 	AppID           uint32 `json:"app_id" validate:"nonzero"`
+}
+
+// TransactionsUpdateRequest ...
+type TransactionsUpdateRequest struct {
+	TradeofferID string `json:"tradeoffer_id" validate:"nonzero"`
+	Status       uint8  `json:"statis" validate:"nonzero"`
 }

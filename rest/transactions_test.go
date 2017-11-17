@@ -73,4 +73,47 @@ func transactionsCheck(t *testing.T) {
 		assert.Equal(t, labels.SELLTOUS, int(transactionresp[1].Type), body)
 		assert.Equal(t, 8, int(transactionresp[0].Amount), body)
 	}
+
+	// update next
+	transactionupdatereq1 := &keys.TransactionsUpdateRequest{
+		Status: labels.ACCEPTED,
+	}
+	transactionupdatereq2 := &keys.TransactionsUpdateRequest{
+		Status: labels.DECLINED,
+	}
+	jsonreq, _ = json.Marshal(transactionupdatereq1)
+	_, body = callEndpoint(t, ts, "PUT", "/api/v1/keys-transactions/"+testTradeOfferID1+"?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+	jsonreq, _ = json.Marshal(transactionupdatereq2)
+	_, body = callEndpoint(t, ts, "PUT", "/api/v1/keys-transactions/"+testTradeOfferID2+"?key="+config.SteamBotsAPIKey(), bytes.NewReader(jsonreq), jwt)
+
+	var successUpdateResp common.SuccessResponse
+	if err := json.Unmarshal([]byte(body), &successUpdateResp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	assert.Equal(t, successUpdateResp.StatusText, "Transaction has been updated", successUpdateResp.StatusText+", "+successUpdateResp.SuccessText)
+
+	_, body = callEndpoint(t, ts, "GET", "/api/v1/keys-transactions", nil, jwt)
+	transactionresp = make([]keys.TransactionsResponse, 2)
+	if err := json.Unmarshal([]byte(body), &transactionresp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+
+	for _, transaction := range transactionresp {
+		if err := validator.Validate(transaction); err != nil {
+			t.Fatalf("Error: %s", err.Error())
+		}
+	}
+
+	if assert.Equal(t, 2, len(transactionresp), body) {
+		assert.Equal(t, labels.ACCEPTED, int(transactionresp[1].Status), body)
+		assert.Equal(t, labels.DECLINED, int(transactionresp[0].Status), body)
+	}
+
+	jsonreq, _ = json.Marshal(transactionupdatereq1)
+	_, body = callEndpoint(t, ts, "PUT", "/api/v1/keys-transactions/"+testTradeOfferID1+"?key="+config.SteamBotsAPIKey()+"aa", bytes.NewReader(jsonreq), jwt)
+	var errorUpdateResp common.ErrResponse
+	if err := json.Unmarshal([]byte(body), &errorUpdateResp); err != nil {
+		t.Fatalf("Failed to Unmarshal, got: %s, error: %s", body, err.Error())
+	}
+	assert.Equal(t, errorUpdateResp.StatusText, "Invalid request", body)
 }

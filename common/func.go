@@ -3,6 +3,7 @@ package common
 import (
 	"database/sql"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/render"
 	"github.com/mtdx/keyc/validator"
@@ -60,4 +61,16 @@ func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 	}()
 	err = txFunc(tx)
 	return err
+}
+
+// IsOurSteamBot ...
+func IsOurSteamBot(dbconn *sql.DB, ip string) bool {
+	var dbip string
+	ip = ip[0:strings.Index(ip, ":")]
+	err := dbconn.QueryRow("SELECT ip_address FROM steam_bots WHERE ip_address = $1", ip).Scan(&dbip)
+	if err != nil || err == sql.ErrNoRows {
+		return false
+	}
+
+	return dbip == ip
 }
