@@ -65,7 +65,7 @@ func saveWithdrawal(dbconn *sql.DB, withdrawal *WithdrawalsRequest, userid inter
 		if err != nil || err == sql.ErrNoRows {
 			return err
 		}
-		if btcrate == 0 || updatedAt.Unix() < time.Now().Unix()-2 {
+		if btcrate == 0 || updatedAt.Unix() < time.Now().Unix()-4 {
 			return errors.New("Invalid BTC rate or not recently updated")
 		}
 		if _, err := tx.Exec(`INSERT INTO withdrawals (user_steam_id, payment_address, usd_rate, currency, 
