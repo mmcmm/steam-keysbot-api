@@ -10,7 +10,6 @@ import (
 	"github.com/go-chi/render"
 	"github.com/mtdx/keyc/common"
 	"github.com/mtdx/keyc/config"
-	"github.com/mtdx/keyc/steam"
 )
 
 // TransactionsHandler rest route handler GET /keys-transactions
@@ -25,7 +24,7 @@ func TransactionsHandler(w http.ResponseWriter, r *http.Request) {
 func TransactionCreateHandler(w http.ResponseWriter, r *http.Request) {
 	queryValues := r.URL.Query()
 	dbconn := r.Context().Value("DBCONN").(*sql.DB)
-	if queryValues.Get("key") != config.SteamBotsAPIKey() || !steam.IsOurSteamBot(dbconn, r.RemoteAddr) {
+	if queryValues.Get("key") != config.SteamBotsAPIKey() || !common.IsOurSteamBot(dbconn, r.RemoteAddr) {
 		render.Render(w, r, common.ErrInvalidRequest(errors.New("Unauthorized")))
 		return
 	}

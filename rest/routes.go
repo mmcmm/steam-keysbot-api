@@ -7,7 +7,6 @@ import (
 	"github.com/mtdx/keyc/account"
 	"github.com/mtdx/keyc/keys"
 	"github.com/mtdx/keyc/openid/steamauth"
-	"github.com/mtdx/keyc/steam"
 	"github.com/mtdx/keyc/vault"
 
 	"github.com/go-chi/chi"
@@ -30,15 +29,12 @@ func routes() {
 			r.Use(jwtauth.Authenticator)
 
 			r.Get("/account", account.InfoHandler)
-			r.Get("/tradeoffers", steam.TradeoffersHandler)
 
 			r.Get("/keys-transactions", keys.TransactionsHandler)
 
 			r.Get("/withdrawals", vault.WithdrawalsHandler)
 			r.Post("/withdrawals", vault.WithdrawalRequestHandler)
 		})
-		// Unprotected routes
-		r.Post("/tradeoffers", steam.TradeoffersCreateHandler)
 
 		r.Put("/keys-transactions/{tradeofferID:[1-9]+}", keys.TransactionUpdateHandler)
 		r.Post("/keys-transactions", keys.TransactionCreateHandler)

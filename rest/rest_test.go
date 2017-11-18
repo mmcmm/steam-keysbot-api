@@ -128,7 +128,6 @@ func cleanTestUserData(dbconn *sql.DB) {
 	_, err = dbconn.Exec(`DELETE FROM key_transactions WHERE user_steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM withdrawals WHERE user_steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM sales WHERE user_steam_id = $1`, testSteamID)
-	_, err = dbconn.Exec(`DELETE FROM tradeoffers WHERE user_steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM steam_bots WHERE steam_id = $1`, testSteamID)
 	_, err = dbconn.Exec(`DELETE FROM users WHERE steam_id = $1`, testSteamID)
 
